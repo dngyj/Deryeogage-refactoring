@@ -35,3 +35,7 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### mac m1 ###
+.DS_Store
+assets/.DS_Store
