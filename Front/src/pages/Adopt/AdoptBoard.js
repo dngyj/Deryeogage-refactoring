@@ -105,9 +105,10 @@ function AdoptBoard() {
         },
       });
       //setAdoptData(response.data.data);
+      console.log("게시글목록",response);
 
       //tmap
-      const dogs = response.data.data;
+      const dogs = response.data;
       // Calculate distance for each dog
       const dogsWithDistance = await Promise.all(
         dogs.map(async (dog) => {
