@@ -53,8 +53,9 @@ function AdoptBoardCreate() {
       axios
         .get(`${REACT_APP_API_URL}/boards/each/${boardId}`)
         .then((response) => {
+          console.log(response);
           setIsEditing(true);
-          const data = response.data.data;
+          const data = response.data;
           const dogData = data[0];
           const mediaData = data[1];
           // 다른 상태 설정

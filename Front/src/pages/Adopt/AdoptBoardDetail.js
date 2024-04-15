@@ -119,12 +119,12 @@ function AdoptBoardDetail() {
           console.log("게시판 상세조회 할 때 가져오는 것들 ~~~", response);
           console.log(
             "status를 보자 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
-            response.data.data[0].status
+            response.data[0].status
           );
 
           setAdoptData({
-            board: response.data.data[0],
-            images: response.data.data[1],
+            board: response.data[0],
+            images: response.data[1],
           });
         } catch (error) {
           console.error(error);
@@ -159,7 +159,7 @@ function AdoptBoardDetail() {
             Authorization: `Bearer ${token}`,
           },
         });
-        const filteredData = response.data.data.filter(
+        const filteredData = response.data.filter(
           (item) => item.boardId === parseInt(boardId)
         );
         setPrecostsData(filteredData[0].returnYn); // Set the filtered data to the state
