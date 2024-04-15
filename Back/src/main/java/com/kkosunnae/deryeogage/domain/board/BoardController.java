@@ -8,6 +8,7 @@ import com.kkosunnae.deryeogage.global.util.Response;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,12 +36,13 @@ public class BoardController {
     // 동시에 사용하려면 요청의 Content-Type이 multipart/form-data이어야 합니다.
     @PostMapping
     public Response<Object> saveBoard(@RequestHeader("Authorization") String authorizationHeader, BoardDto boardDto, @RequestPart("multipartFile") List<MultipartFile> multipartFile) {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start("saveBoardController");
+        // 실행 코드
         String jwtToken = authorizationHeader.substring(7);
         log.info("헤더에서 가져온 토큰 정보: " + jwtToken);
-
         Long userId = jwtUtil.getUserId(jwtToken);
         boardDto.setUserId(userId);
-
         log.info("userId :", boardDto.getUserId());
 
         Integer boardId = boardService.save(boardDto);
@@ -50,6 +52,9 @@ public class BoardController {
 
         // DB에 파일이름 저장
         boardService.saveBoardFile(boardId, nameList);
+        stopWatch.stop();
+        log.info(stopWatch.prettyPrint());
+        log.info("코드 실행 시간 (s): " + stopWatch.getTotalTimeSeconds());
         return Response.success(boardId);
     }
 
@@ -154,7 +159,14 @@ public class BoardController {
     //글 목록 조회
     @GetMapping("/list")
     public Response<List<BoardDto>> findBoards() {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start("findAllBoardController");
+
         List<BoardDto> boardSetList = boardService.findAll();
+
+        stopWatch.stop();
+        log.info(stopWatch.prettyPrint());
+        log.info("코드 실행 시간 (s): " + stopWatch.getTotalTimeSeconds());
         return Response.success(boardSetList);
     }
 
