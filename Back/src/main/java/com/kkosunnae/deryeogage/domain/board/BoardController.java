@@ -34,8 +34,7 @@ public class BoardController {
     private final AdoptRepository adoptRepository;
 
     // 글 작성 // Swagger 하려면 @requestBody 삭제 필요
-    // 한 가지 주의할 점은, @RequestBody와 @RequestPart를
-    // 동시에 사용하려면 요청의 Content-Type이 multipart/form-data이어야 합니다.
+    // @RequestBody와 @RequestPart를 동시에 사용하려면 요청의 Content-Type이 multipart/form-data
     @PostMapping
     public ResponseEntity<?> saveBoard(@RequestHeader("Authorization") String authorizationHeader, BoardDto boardDto, @RequestPart("multipartFile") List<MultipartFile> multipartFile) {
         StopWatch stopWatch = new StopWatch();

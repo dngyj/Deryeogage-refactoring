@@ -3,6 +3,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '2.7.14'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	id 'jacoco'
 }
 
 group = 'com.kkosunnae'
@@ -60,6 +61,53 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 }
 
-tasks.named('test') {
+//jacoco 테스트
+jacoco {
+	toolVersion = "0.8.11"
+}
+
+test {
+	finalizedBy jacocoTestReport
 	useJUnitPlatform()
+	jacoco {
+		excludes = [ //테스트 커버리지 측정에서 제외
+			'**/global/**',
+			'**/chat/**',
+			'**/cost/**',
+			'**/user/**',
+			'**/simulation/**',
+			'**/adopt/**',
+			'**/mission/**',
+			'**/survey/**',
+			'**/pretest/**'
+//			'**/interceptor/**'
+		]
+	}
+}
+
+jacocoTestReport {
+	reports {
+		xml.required = false
+		csv.required = false
+		html.required = true
+	}
+	finalizedBy jacocoTestCoverageVerification
+}
+
+
+// 커버리지 검증
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			enabled = true
+			element = 'CLASS'
+//			includes = ['org.gradle.*']
+
+			limit {
+				counter = 'LINE'
+				value = 'COVEREDRATIO'
+				minimum = 0.0 //커버리지 0.6
+			}
+		}
+	}
 }
