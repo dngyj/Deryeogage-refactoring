@@ -66,84 +66,84 @@ class BoardControllerTest {
         verify(boardService, times(1)).saveBoardFile(boardId, nameList);
     }
 
-    @Test
-    void selectBoard() {
-        // given
-
-        // when
-
-        // then
-    }
-
-    @Test
-    void updateBoard() {
-        // given
-
-        // when
-
-        // then
-    }
-
-    @Test
-    void deleteBoard() {
-        // given
-
-        // when
-
-        // then
-    }
-
-    @Test
-    void findBoards() {
-        // given
-
-        // when
-
-        // then
-    }
-
-    @Test
-    void findMyBoards() {
-        // given
-
-        // when
-
-        // then
-    }
-
-    @Test
-    void findRecommendedBoards() {
-        // given
-
-        // when
-
-        // then
-    }
-
-    @Test
-    void boardLike() {
-        // given
-
-        // when
-
-        // then
-    }
-
-    @Test
-    void boardUnlike() {
-        // given
-
-        // when
-
-        // then
-    }
-
-    @Test
-    void getboardLike() {
-        // given
-
-        // when
-
-        // then
-    }
+//    @Test
+//    void selectBoard() {
+//        // given
+//
+//        // when
+//
+//        // then
+//    }
+//
+//    @Test
+//    void updateBoard() {
+//        // given
+//
+//        // when
+//
+//        // then
+//    }
+//
+//    @Test
+//    void deleteBoard() {
+//        // given
+//
+//        // when
+//
+//        // then
+//    }
+//
+//    @Test
+//    void findBoards() {
+//        // given
+//
+//        // when
+//
+//        // then
+//    }
+//
+//    @Test
+//    void findMyBoards() {
+//        // given
+//
+//        // when
+//
+//        // then
+//    }
+//
+//    @Test
+//    void findRecommendedBoards() {
+//        // given
+//
+//        // when
+//
+//        // then
+//    }
+//
+//    @Test
+//    void boardLike() {
+//        // given
+//
+//        // when
+//
+//        // then
+//    }
+//
+//    @Test
+//    void boardUnlike() {
+//        // given
+//
+//        // when
+//
+//        // then
+//    }
+//
+//    @Test
+//    void getboardLike() {
+//        // given
+//
+//        // when
+//
+//        // then
+//    }
 }
