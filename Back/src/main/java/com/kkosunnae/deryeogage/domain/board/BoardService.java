@@ -3,10 +3,13 @@ package com.kkosunnae.deryeogage.domain.board;
 import com.kkosunnae.deryeogage.domain.adopt.AdoptEntity;
 import com.kkosunnae.deryeogage.domain.adopt.AdoptRepository;
 import com.kkosunnae.deryeogage.domain.adopt.AdoptStatus;
+import com.kkosunnae.deryeogage.domain.board.dto.BoardRequest;
+import com.kkosunnae.deryeogage.domain.board.dto.BoardResponse;
 import com.kkosunnae.deryeogage.domain.survey.SurveyEntity;
 import com.kkosunnae.deryeogage.domain.survey.SurveyRepository;
 import com.kkosunnae.deryeogage.domain.user.UserEntity;
 import com.kkosunnae.deryeogage.domain.user.UserRepository;
+import com.kkosunnae.deryeogage.global.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,33 +34,33 @@ public class BoardService {
 
     //게시글 작성
     @Transactional
-    public int save(BoardDto boardDto) {
-        log.info("게시글 제목 : ", boardDto.getTitle());
-        boardDto.setCreatedDate(LocalDateTime.now());
+    public int save(BoardRequest request, Long userId) {
+//        log.info("게시글 제목 : ", request.getTitle());
 
-        Optional<UserEntity> user = userRepository.findById(boardDto.getUserId());
-        boardDto.setUserNickname(user.get().getNickname());
+        request.setCreatedDate(LocalDateTime.now());
+        request.setUserId(userId);
 
-        log.info("user 닉네임게시글작성서비스: " + user.get().getNickname());
-
-        BoardEntity board = boardRepository.save(boardDto.toEntity(userRepository));
+        Optional<UserEntity> user = userRepository.findById(request.getUserId());
+        request.setUserNickname(user.get().getNickname());
+//      log.info("user 닉네임게시글작성서비스: " + user.get().getNickname());
+        BoardEntity board = boardRepository.save(request.toEntity(userRepository));
         return board.getId();
     }
 
 
     //게시글 수정
     @Transactional
-    public int update(Integer id, BoardDto boardDto) {
+    public int update(Integer id, BoardRequest request) {
         BoardEntity board = boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 유저의 게시글이 없습니다. id : " + id));
 
-        Optional<UserEntity> user = userRepository.findById(boardDto.getUserId());
+        Optional<UserEntity> user = userRepository.findById(request.getUserId());
         if (user.isPresent()) {
-            boardDto.setUserNickname(user.get().getNickname());
-            boardDto.setCreatedDate(LocalDateTime.now());
-            board.update(boardDto);
+            request.setUserNickname(user.get().getNickname());
+            request.setCreatedDate(LocalDateTime.now());
+            board.update(request);
             return board.getId();
         } else {
-            throw new IllegalArgumentException("해당 유저가 존재하지 않습니다. user id: " + boardDto.getUserId());
+            throw new IllegalArgumentException("해당 유저가 존재하지 않습니다. user id: " + request.getUserId());
         }
     }
 
@@ -69,26 +72,29 @@ public class BoardService {
 
     //게시글 상세 조회
     @Transactional(readOnly = true)
-    public BoardDto getBoard(Integer boardId) {
+    public BoardResponse getBoard(Integer boardId, Long userId) {
         BoardEntity board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
-        // 입양 정보에 존재 여부 및 depart/arrive 확인하여 게시글별 status 반환
-        Optional<AdoptEntity> entity = adoptRepository.findByBoardId(boardId);
+        BoardResponse response = board.from();
 
-        // 초기화
-        AdoptStatus status = AdoptStatus.depart;
-
-        if (entity.isPresent()) {
-            status = entity.get().getStatus();
+        if (userId != null && response.getUserId()==userId) {
+            response.setWriter(true);
         } else {
-            status = null;
+            response.setWriter(false);
         }
+        // 입양 정보에 존재 여부 및 depart/arrive 확인하여 게시글별 status 반환
+        Optional<AdoptEntity> adopt = adoptRepository.findByBoardId(boardId);
+        if (adopt.isPresent()) {
+            response.setAdopter(adopt.get().getToUser().getId().equals(userId));
+            response.setStatus(adopt.get().getStatus());
+        } else {
+            response.setWriter(false);
+        }
+        AdoptStatus status = adopt.map(AdoptEntity::getStatus).orElse(null);
+        response.setStatus(status);
 
-        BoardDto boardDto = board.toDto();
-        boardDto.setStatus(status);
-
-        return boardDto;
+        return response;
     }
 
     @Transactional(readOnly = true)
@@ -332,4 +338,14 @@ public class BoardService {
 
         return uploadedFiles;
     }
+
+    @Transactional
+    public void deleteBoardFiles(int boardId, List<String> removedImages) {
+        for(String path : removedImages){
+            path = path.replaceAll("[\"\\[\\]]", "");
+            log.info("remove : "+path);
+            boardFileRepository.deleteByBoard_IdAndPath(boardId, path);
+        }
+    }
+
 }
