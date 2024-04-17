@@ -68,8 +68,8 @@ public class BoardRequest {
                 .build();
     }
 
-    public static BoardRequest from(BoardEntity board){
-
-    }
+//    public static BoardRequest from(BoardEntity board){
+//
+//    }
 
 }

@@ -1,7 +1,9 @@
 package com.kkosunnae.deryeogage.domain.board;
 
 import com.kkosunnae.deryeogage.domain.adopt.AdoptEntity;
-import com.kkosunnae.deryeogage.domain.chat.ChatRoomEntity;
+//import com.kkosunnae.deryeogage.domain.board.dto.BoardDto;
+import com.kkosunnae.deryeogage.domain.board.dto.BoardRequest;
+import com.kkosunnae.deryeogage.domain.board.dto.BoardResponse;
 import com.kkosunnae.deryeogage.domain.cost.PostCostEntity;
 import com.kkosunnae.deryeogage.domain.cost.PreCostEntity;
 import com.kkosunnae.deryeogage.domain.user.UserEntity;
@@ -117,8 +119,33 @@ public class BoardEntity {
         this.createdDate = createdDate;
     }
 
-    public BoardDto toDto(){
-        return BoardDto.builder()
+//    public BoardDto toDto(){
+//        return BoardDto.builder()
+//                .id(this.id)
+//                .userId(this.user.getId())
+//                .regionCode(this.regionCode)
+//                .lat(this.lat)
+//                .lon(this.lon)
+//                .dogTypeCode(this.dogTypeCode)
+//                .userNickname(this.userNickname)
+//                .title(this.title)
+//                .friendly(this.friendly)
+//                .activity(this.activity)
+//                .dependency(this.dependency)
+//                .bark(this.bark)
+//                .hair(this.hair)
+//                .name(this.name)
+//                .gender(this.gender)
+//                .age(this.age)
+//                .chipYn(this.chipYn)
+//                .health(this.health)
+//                .introduction(this.introduction)
+//                .createdDate(this.createdDate)
+//                .build();
+//    }
+
+    public BoardResponse from(){
+        return BoardResponse.builder()
                 .id(this.id)
                 .userId(this.user.getId())
                 .regionCode(this.regionCode)
@@ -141,7 +168,27 @@ public class BoardEntity {
                 .createdDate(this.createdDate)
                 .build();
     }
-    public void update(BoardDto boardDto) {
+
+//    public void update(BoardDto boardDto) {
+//        this.title = boardDto.getTitle();
+//        this.friendly = boardDto.getFriendly();
+//        this.activity = boardDto.getActivity();
+//        this.dependency = boardDto.getDependency();
+//        this.bark = boardDto.getBark();
+//        this.hair = boardDto.getHair();
+//        this.name = boardDto.getName();
+//        this.gender = boardDto.isGender();
+//        this.age = boardDto.getAge();
+//        this.chipYn = boardDto.isChipYn();
+//        this.health = boardDto.getHealth();
+//        this.introduction = boardDto.getIntroduction();
+//        this.createdDate = boardDto.getCreatedDate();
+//        this.regionCode = boardDto.getRegionCode();
+//        this.dogTypeCode = boardDto.getDogTypeCode();
+//        this.lat = boardDto.getLat();
+//        this.lon = boardDto.getLon();
+//    }
+    public void update(BoardRequest boardDto) {
         this.title = boardDto.getTitle();
         this.friendly = boardDto.getFriendly();
         this.activity = boardDto.getActivity();
