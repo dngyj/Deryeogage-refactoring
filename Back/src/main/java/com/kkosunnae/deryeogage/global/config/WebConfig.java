@@ -33,13 +33,10 @@ public class WebConfig implements WebMvcConfigurer {
                         "/v3/api-docs/**",
                         "/webjars/**",
                         "/api/users/oauth",
-                        "/api/boards/list"); //추천 알고리즘은 어떻게 처리하지
-
-
+                        "/api/boards/list",
+                        "/api/boards/each/**");
     }
 
-    //CORS 에러를 해결하기 위해서 컨트롤러에서 세분화 하여 처리할 수도 있지만
-    //전역설정처럼 여기서 한방에 처리할 수도 있음..
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")

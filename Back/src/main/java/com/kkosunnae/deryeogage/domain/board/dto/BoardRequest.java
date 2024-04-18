@@ -1,6 +1,7 @@
-package com.kkosunnae.deryeogage.domain.board;
+package com.kkosunnae.deryeogage.domain.board.dto;
 
 import com.kkosunnae.deryeogage.domain.adopt.AdoptStatus;
+import com.kkosunnae.deryeogage.domain.board.BoardEntity;
 import com.kkosunnae.deryeogage.domain.user.UserEntity;
 import com.kkosunnae.deryeogage.domain.user.UserRepository;
 import lombok.*;
@@ -9,10 +10,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+
 @Getter
 @Setter
 @NoArgsConstructor
-public class BoardDto {
+@Builder
+@AllArgsConstructor
+public class BoardRequest {
     private int id;
     private long userId;
     private String regionCode;
@@ -38,43 +42,9 @@ public class BoardDto {
     private boolean isAdopter;
     private AdoptStatus status;
 
-
-    public boolean isChipYn() {
-        return chipYn;
-    }
-    public boolean isGender() {
-        return gender;
-    }
-
-    @Builder
-    public BoardDto(int id, long userId, String regionCode, Double lat, Double lon, String dogTypeCode, String userNickname, String title, char friendly, char activity, char dependency, char bark, char hair, String name, boolean gender, byte age, boolean chipYn, String health, String introduction, LocalDateTime createdDate, AdoptStatus status) {
-        this.id = id;
-        this.userId = userId;
-        this.regionCode = regionCode;
-        this.lat = lat;
-        this.lon = lon;
-        this.dogTypeCode = dogTypeCode;
-        this.userNickname = userNickname;
-        this.title = title;
-        this.friendly = friendly;
-        this.activity = activity;
-        this.dependency = dependency;
-        this.bark = bark;
-        this.hair = hair;
-        this.name = name;
-        this.gender = gender;
-        this.age = age;
-        this.chipYn = chipYn;
-        this.health = health;
-        this.introduction = introduction;
-        this.createdDate = createdDate;
-        this.status = status;
-    }
-
-
     public BoardEntity toEntity(UserRepository userRepository){
         UserEntity user = userRepository.findById(this.userId)
-           .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다. userId: " + userId));
         return BoardEntity.builder()
                 .user(user)
                 .regionCode(regionCode)
@@ -97,4 +67,9 @@ public class BoardDto {
                 .createdDate(createdDate)
                 .build();
     }
+
+//    public static BoardRequest from(BoardEntity board){
+//
+//    }
+
 }

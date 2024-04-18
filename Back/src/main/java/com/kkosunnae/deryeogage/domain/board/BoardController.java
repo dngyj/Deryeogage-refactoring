@@ -2,9 +2,10 @@ package com.kkosunnae.deryeogage.domain.board;
 
 import com.kkosunnae.deryeogage.domain.adopt.AdoptEntity;
 import com.kkosunnae.deryeogage.domain.adopt.AdoptRepository;
+import com.kkosunnae.deryeogage.domain.board.dto.BoardRequest;
+import com.kkosunnae.deryeogage.domain.board.dto.BoardResponse;
 import com.kkosunnae.deryeogage.global.s3file.S3FileService;
 import com.kkosunnae.deryeogage.global.util.JwtUtil;
-import com.kkosunnae.deryeogage.global.util.Response;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,106 +30,85 @@ public class BoardController {
 
     private final S3FileService s3FileService;
 
-    private final BoardFileRepository boardFileRepository;
-
-    private final AdoptRepository adoptRepository;
 
     // 글 작성 // Swagger 하려면 @requestBody 삭제 필요
     // @RequestBody와 @RequestPart를 동시에 사용하려면 요청의 Content-Type이 multipart/form-data
     @PostMapping
-    public ResponseEntity<?> saveBoard(@RequestHeader("Authorization") String authorizationHeader, BoardDto boardDto, @RequestPart("multipartFile") List<MultipartFile> multipartFile) {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start("saveBoardController");
-        // 실행 코드
+    public ResponseEntity<?> saveBoard(@RequestHeader("Authorization") String authorizationHeader,
+                                       BoardRequest request,
+                                       @RequestPart("multipartFile") List<MultipartFile> multipartFile
+    ) {
+//        StopWatch stopWatch = new StopWatch();
+//        stopWatch.start("saveBoardController");
         String jwtToken = authorizationHeader.substring(7);
-        log.info("헤더에서 가져온 토큰 정보: " + jwtToken);
         Long userId = jwtUtil.getUserId(jwtToken);
-        boardDto.setUserId(userId);
-        log.info("userId :", boardDto.getUserId());
-
-        Integer boardId = boardService.save(boardDto);
-
+        Integer boardId = boardService.save(request , userId);
         // 원본 파일명과 S3에 저장된 파일명이 담긴 Map
         Map<String, List> nameList = s3FileService.uploadFile(multipartFile);
-
         // DB에 파일이름 저장
         boardService.saveBoardFile(boardId, nameList);
-        stopWatch.stop();
-        log.info(stopWatch.prettyPrint());
-        log.info("코드 실행 시간 (s): " + stopWatch.getTotalTimeSeconds());
+//        stopWatch.stop();
+//        log.info(stopWatch.prettyPrint());
+//        log.info("코드 실행 시간 (s): " + stopWatch.getTotalTimeSeconds());
         return new ResponseEntity<>(boardId, HttpStatus.OK);
     }
 
 
     //글 상세조회 + 작성자 여부 boolean으로 반영
     @GetMapping("/each/{boardId}")
-    public ResponseEntity<?> selectBoard(@RequestHeader(value = "Authorization", required = false) String authorizationHeader, @PathVariable int boardId) {
-        BoardDto thisBoard = boardService.getBoard(boardId);
+    public ResponseEntity<?> selectBoard(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
+            @PathVariable int boardId
+    ) {
+        Long userId = null;
 
         // 요청한 사용자가 로그인 되어 있는 경우
         if (authorizationHeader != null) {
             String jwtToken = authorizationHeader.substring(7);
-            Long requestUser = jwtUtil.getUserId(jwtToken);
-            log.info("userid : "+thisBoard.getUserId()+" requestuserid : "+requestUser);
-            // 작성자 여부 파악하여 DTO에 담기
-            if (thisBoard.getUserId() == requestUser) {
-                thisBoard.setWriter(true);
-            } else {
-                thisBoard.setWriter(false);
-            }
-
-            Optional<AdoptEntity> adoptEntity = adoptRepository.findByBoardId(boardId);
-            if(!adoptEntity.isEmpty()){
-                thisBoard.setAdopter(adoptEntity.get().getToUser().getId().equals(requestUser));
-                thisBoard.setStatus(adoptEntity.get().getStatus());
-                log.info("adapter : "+thisBoard.isAdopter());
-            }
-        } else {// 로그인하지 않은 경우
-            thisBoard.setWriter(false);
+            userId = jwtUtil.getUserId(jwtToken);
         }
-
+        BoardResponse response = boardService.getBoard(boardId, userId);
         Map<String, String> uploadedFiles = boardService.getBoardFiles(boardId);
         List<Object> boardSet = new ArrayList<>();
-        boardSet.add(thisBoard);
+        boardSet.add(response);
         boardSet.add(uploadedFiles);
         return new ResponseEntity<>(boardSet,HttpStatus.OK);
     }
 
     //글 수정
     @PutMapping("/{boardId}")
-    public ResponseEntity<?> updateBoard(@RequestHeader("Authorization") String authorizationHeader,
-                                        BoardDto boardDto,
-                                        @PathVariable int boardId,
-                                        @RequestPart(value = "multipartFile", required = false) List<MultipartFile> multipartFile,
-                                        @RequestParam(value = "removedImages", required = false) List<String> removedImages
+    public ResponseEntity<?> updateBoard(
+            @RequestHeader("Authorization") String authorizationHeader,
+            BoardRequest request,
+            @PathVariable int boardId,
+            @RequestPart(value = "multipartFile", required = false) List<MultipartFile> multipartFile,
+            @RequestParam(value = "removedImages", required = false) List<String> removedImages
     ) {
-        // ... 기타 코드는 유지 ...
-
         String jwtToken = authorizationHeader.substring(7);
         Long requestUserId = jwtUtil.getUserId(jwtToken);
 
-        BoardDto thisBoard = boardService.getBoard(boardId);
-
-        log.info("수정: 게시글 유저 정보 : " + thisBoard.getUserId());
-        log.info("요청 유저 정보 : " + requestUserId);
-
+        //TODO: 메서드 가볍게 만들기 + 조건문 변경
+        BoardResponse thisBoard = boardService.getBoard(boardId, requestUserId);
+//       log.info("수정: 게시글 유저 정보 : " + thisBoard.getUserId());
+//       log.info("요청 유저 정보 : " + requestUserId);
         if (thisBoard.getUserId() != requestUserId) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        boardDto.setUserId(requestUserId);
 
-        boardService.update(boardId, boardDto);
+        request.setUserId(requestUserId);
+
+        boardService.update(boardId, request);
 
         if (multipartFile != null && !multipartFile.isEmpty()) {
             Map<String, List> nameList = s3FileService.uploadFile(multipartFile);
             boardService.saveBoardFile(boardId, nameList);
         }
 
-        if(!removedImages.isEmpty()){
+        if(removedImages != null && !removedImages.isEmpty()){
+            boardService.deleteBoardFiles(boardId, removedImages);
             for(String path : removedImages){
                 path=path.replaceAll("[\"\\[\\]]", "");
-                log.info("remove : "+path);
-                boardFileRepository.deleteByBoard_IdAndPath(boardId, path );
+//                log.info("remove : "+path);
                 s3FileService.deleteFileByUrl(path);
             }
         }
@@ -137,12 +117,15 @@ public class BoardController {
 
     //글 삭제
     @DeleteMapping("/{boardId}")
-    public ResponseEntity<?> deleteBoard(@RequestHeader("Authorization") String authorizationHeader, @PathVariable int boardId) {
-
+    public ResponseEntity<?> deleteBoard(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable int boardId
+    ) {
         String jwtToken = authorizationHeader.substring(7);
         Long requestUserId = jwtUtil.getUserId(jwtToken);
 
-        BoardDto thisBoard = boardService.getBoard(boardId);
+        //TODO: 메서드 가볍게 만들기 + 조건문 변경
+        BoardResponse thisBoard = boardService.getBoard(boardId, requestUserId);
         if (thisBoard.getUserId() != requestUserId) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -159,14 +142,11 @@ public class BoardController {
     public ResponseEntity<?> findBoards() {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start("findAllBoardController");
-
-        List<BoardDto> boardSetList = boardService.findAll();
-
+        List<BoardResponse> boardSetList = boardService.findAll();
         stopWatch.stop();
         log.info(stopWatch.prettyPrint());
         log.info("코드 실행 시간 (s): " + stopWatch.getTotalTimeSeconds());
         return new ResponseEntity<>(boardSetList,HttpStatus.OK);
-//    Response.success(boardSetList);
     }
 
     //내가 쓴 글 목록 조회(마이페이지)
@@ -174,7 +154,7 @@ public class BoardController {
     public ResponseEntity<?> findMyBoards(@RequestHeader("Authorization") String authorizationHeader) {
         String jwtToken = authorizationHeader.substring(7);
         Long userId = jwtUtil.getUserId(jwtToken);
-        List<BoardDto> boardSetMap = boardService.findMyBoards(userId);
+        List<BoardResponse> boardSetMap = boardService.findMyBoards(userId);
         return new ResponseEntity<>(boardSetMap,HttpStatus.OK);
     }
 
@@ -183,7 +163,7 @@ public class BoardController {
     public ResponseEntity<?> findRecommendedBoards(@RequestHeader("Authorization") String authorizationHeader) {
         String jwtToken = authorizationHeader.substring(7);
         Long userId = jwtUtil.getUserId(jwtToken);
-        List<BoardDto> boardList = boardService.findRecommendation(userId);
+        List<BoardResponse> boardList = boardService.findRecommendation(userId);
         return new ResponseEntity<>(boardList, HttpStatus.OK);
     }
 

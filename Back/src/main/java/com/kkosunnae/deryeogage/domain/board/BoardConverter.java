@@ -4,7 +4,7 @@ import com.kkosunnae.deryeogage.domain.user.UserEntity;
 import com.kkosunnae.deryeogage.domain.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-//import com.kkosunnae.deryeogage.domain.board.BoardDto.BoardRequestDto;/
+//import com.kkosunnae.deryeogage.domain.board.dto.BoardDto.BoardRequestDto;/
 
 
 import java.util.NoSuchElementException;
