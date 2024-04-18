@@ -30,9 +30,6 @@ public class BoardController {
 
     private final S3FileService s3FileService;
 
-    private final BoardFileRepository boardFileRepository;
-
-    private final AdoptRepository adoptRepository;
 
     // 글 작성 // Swagger 하려면 @requestBody 삭제 필요
     // @RequestBody와 @RequestPart를 동시에 사용하려면 요청의 Content-Type이 multipart/form-data
@@ -41,20 +38,18 @@ public class BoardController {
                                        BoardRequest request,
                                        @RequestPart("multipartFile") List<MultipartFile> multipartFile
     ) {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start("saveBoardController");
+//        StopWatch stopWatch = new StopWatch();
+//        stopWatch.start("saveBoardController");
         String jwtToken = authorizationHeader.substring(7);
         Long userId = jwtUtil.getUserId(jwtToken);
-
         Integer boardId = boardService.save(request , userId);
         // 원본 파일명과 S3에 저장된 파일명이 담긴 Map
         Map<String, List> nameList = s3FileService.uploadFile(multipartFile);
-
         // DB에 파일이름 저장
         boardService.saveBoardFile(boardId, nameList);
-        stopWatch.stop();
-        log.info(stopWatch.prettyPrint());
-        log.info("코드 실행 시간 (s): " + stopWatch.getTotalTimeSeconds());
+//        stopWatch.stop();
+//        log.info(stopWatch.prettyPrint());
+//        log.info("코드 실행 시간 (s): " + stopWatch.getTotalTimeSeconds());
         return new ResponseEntity<>(boardId, HttpStatus.OK);
     }
 
@@ -66,13 +61,13 @@ public class BoardController {
             @PathVariable int boardId
     ) {
         Long userId = null;
+
+        // 요청한 사용자가 로그인 되어 있는 경우
         if (authorizationHeader != null) {
             String jwtToken = authorizationHeader.substring(7);
             userId = jwtUtil.getUserId(jwtToken);
         }
         BoardResponse response = boardService.getBoard(boardId, userId);
-
-        // 요청한 사용자가 로그인 되어 있는 경우
         Map<String, String> uploadedFiles = boardService.getBoardFiles(boardId);
         List<Object> boardSet = new ArrayList<>();
         boardSet.add(response);
@@ -92,14 +87,14 @@ public class BoardController {
         String jwtToken = authorizationHeader.substring(7);
         Long requestUserId = jwtUtil.getUserId(jwtToken);
 
+        //TODO: 메서드 가볍게 만들기 + 조건문 변경
         BoardResponse thisBoard = boardService.getBoard(boardId, requestUserId);
-
-//        log.info("수정: 게시글 유저 정보 : " + thisBoard.getUserId());
-//        log.info("요청 유저 정보 : " + requestUserId);
-
-        if (!thisBoard.isWriter()) {
+//       log.info("수정: 게시글 유저 정보 : " + thisBoard.getUserId());
+//       log.info("요청 유저 정보 : " + requestUserId);
+        if (thisBoard.getUserId() != requestUserId) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
         request.setUserId(requestUserId);
 
         boardService.update(boardId, request);
@@ -109,7 +104,7 @@ public class BoardController {
             boardService.saveBoardFile(boardId, nameList);
         }
 
-        if(!removedImages.isEmpty()){
+        if(removedImages != null && !removedImages.isEmpty()){
             boardService.deleteBoardFiles(boardId, removedImages);
             for(String path : removedImages){
                 path=path.replaceAll("[\"\\[\\]]", "");
@@ -122,12 +117,15 @@ public class BoardController {
 
     //글 삭제
     @DeleteMapping("/{boardId}")
-    public ResponseEntity<?> deleteBoard(@RequestHeader("Authorization") String authorizationHeader, @PathVariable int boardId) {
-
+    public ResponseEntity<?> deleteBoard(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable int boardId
+    ) {
         String jwtToken = authorizationHeader.substring(7);
         Long requestUserId = jwtUtil.getUserId(jwtToken);
 
-        BoardDto thisBoard = boardService.getBoard(boardId);
+        //TODO: 메서드 가볍게 만들기 + 조건문 변경
+        BoardResponse thisBoard = boardService.getBoard(boardId, requestUserId);
         if (thisBoard.getUserId() != requestUserId) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -144,14 +142,11 @@ public class BoardController {
     public ResponseEntity<?> findBoards() {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start("findAllBoardController");
-
-        List<BoardDto> boardSetList = boardService.findAll();
-
+        List<BoardResponse> boardSetList = boardService.findAll();
         stopWatch.stop();
         log.info(stopWatch.prettyPrint());
         log.info("코드 실행 시간 (s): " + stopWatch.getTotalTimeSeconds());
         return new ResponseEntity<>(boardSetList,HttpStatus.OK);
-//    Response.success(boardSetList);
     }
 
     //내가 쓴 글 목록 조회(마이페이지)
@@ -159,7 +154,7 @@ public class BoardController {
     public ResponseEntity<?> findMyBoards(@RequestHeader("Authorization") String authorizationHeader) {
         String jwtToken = authorizationHeader.substring(7);
         Long userId = jwtUtil.getUserId(jwtToken);
-        List<BoardDto> boardSetMap = boardService.findMyBoards(userId);
+        List<BoardResponse> boardSetMap = boardService.findMyBoards(userId);
         return new ResponseEntity<>(boardSetMap,HttpStatus.OK);
     }
 
@@ -168,7 +163,7 @@ public class BoardController {
     public ResponseEntity<?> findRecommendedBoards(@RequestHeader("Authorization") String authorizationHeader) {
         String jwtToken = authorizationHeader.substring(7);
         Long userId = jwtUtil.getUserId(jwtToken);
-        List<BoardDto> boardList = boardService.findRecommendation(userId);
+        List<BoardResponse> boardList = boardService.findRecommendation(userId);
         return new ResponseEntity<>(boardList, HttpStatus.OK);
     }
 

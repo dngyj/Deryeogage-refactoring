@@ -1,5 +1,6 @@
 package com.kkosunnae.deryeogage.domain.board;
 import com.kkosunnae.deryeogage.domain.board.dto.BoardRequest;
+import com.kkosunnae.deryeogage.domain.board.dto.BoardResponse;
 import com.kkosunnae.deryeogage.global.s3file.S3FileService;
 import com.kkosunnae.deryeogage.global.util.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -72,14 +74,37 @@ class BoardControllerTest {
         verify(boardService, times(1)).saveBoardFile(boardId, nameList);
     }
 
-//    @Test
-//    void selectBoard() {
-//        // given
-//
-//        // when
-//
-//        // then
-//    }
+    @DisplayName("게시글 상세조회 테스트")
+    @Test
+    @Transactional
+    void selectBoard() {
+        // given
+        String authorizationHeader = null;
+        Integer boardId = 1;
+        Long userId = 1L;
+        BoardResponse response = new BoardResponse();
+        Map<String, String> uploadedFiles = Collections.singletonMap("filename", "s3filename");
+
+        when(jwtUtil.getUserId("token")).thenReturn(userId);
+        when(boardService.getBoard(boardId, userId)).thenReturn(response);
+        when(boardService.getBoardFiles(boardId)).thenReturn(uploadedFiles);
+
+        // when
+        ResponseEntity<?> responseEntity = boardController.selectBoard(authorizationHeader, boardId);
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getBody()).isInstanceOf(List.class);
+
+        List<?> boardSet = (List<?>) responseEntity.getBody();
+        assertThat(boardSet).hasSize(2);
+//        assertThat(boardSet.get(0)).isEqualTo(response);
+        assertThat(boardSet.get(1)).isEqualTo(uploadedFiles);
+
+        verify(jwtUtil, times(1)).getUserId("token");
+        verify(boardService, times(1)).getBoard(boardId, userId);
+        verify(boardService, times(1)).getBoardFiles(boardId);
+    }
 //
 //    @Test
 //    void updateBoard() {

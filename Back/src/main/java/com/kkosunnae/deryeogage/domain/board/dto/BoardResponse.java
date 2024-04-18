@@ -14,6 +14,7 @@ import java.util.NoSuchElementException;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class BoardResponse {
     private int id;
