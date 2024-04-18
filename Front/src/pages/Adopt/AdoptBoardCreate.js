@@ -140,11 +140,16 @@ function AdoptBoardCreate() {
   };
 
   // 이미지 삭제 관련 코드
+
+  const [removedImages, setRemovedImages] = useState([]);
+
   const handleImageRemove = (indexToRemove) => {
     const removedImage = selectedImages[indexToRemove];
 
     // 원본 이미지에서도 제거
     setOriginalImages(originalImages.filter((img) => img !== removedImage));
+
+    setRemovedImages([...removedImages, removedImage]);
 
     setSelectedImages(
       selectedImages.filter((_, index) => index !== indexToRemove)
@@ -225,7 +230,7 @@ function AdoptBoardCreate() {
       title.trim() === "" ||
       dogName.trim() === "" ||
       dogAge <= 0 ||
-      dogRegion.address.trim() === "" ||
+      dogRegion.address.trim() === "" || //TODO: 여기 동작을 제대로 안함
       selectedImages.length === 0 ||
       dogHealth.trim() === "" ||
       dogIntroduction.trim() === ""
@@ -245,6 +250,12 @@ function AdoptBoardCreate() {
     selectedImageFiles.forEach((image) => {
       formData.append("multipartFile", image);
     });
+
+  // 삭제된 이미지 목록 추가
+    if (removedImages.length > 0) {
+      formData.append("removedImages", JSON.stringify(removedImages));
+    }
+  
 
     if (isEditing) {
       const imagesJSON = JSON.stringify(selectedImages);
@@ -283,7 +294,7 @@ function AdoptBoardCreate() {
 
         await axios.put(`${REACT_APP_API_URL}/boards/${boardId}`, formData, {
           headers: {
-            "Content-Type": "multipart/form-data", // 이 부분 추가
+            "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
           },
         });
@@ -310,7 +321,7 @@ function AdoptBoardCreate() {
         );
         sessionStorage.removeItem("adoptData");
 
-        const newBoardId = response.data.data; // 서버의 응답 형식에 따라 이 부분이 수정되어야 할 수 있습니다.
+        const newBoardId = response.data; // 서버의 응답 형식에 따라 이 부분이 수정되어야 할 수 있습니다.
         handlePrecostOpen(newBoardId); // 작성하기 버튼 클릭 시 모달 열기
       }
     } catch (error) {
