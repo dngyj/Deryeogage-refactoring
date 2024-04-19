@@ -1,6 +1,7 @@
 package com.kkosunnae.deryeogage.domain.chat;
 
 import com.kkosunnae.deryeogage.domain.board.BoardRepository;
+import com.kkosunnae.deryeogage.domain.user.UserEntity;
 import com.kkosunnae.deryeogage.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,6 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
-
     private final ChatMessageRepository chatMessageRepository;
 
 
@@ -164,8 +164,15 @@ public class ChatRoomService {
 
     /** ChatRoom 생성 */
     @Transactional
-    public ChatRoomResponseDto save(Long userId2, ChatRoomRequestDto chatRoomRequestDto) {
-        ChatRoomEntity chatRoomEntity = chatRoomRequestDto.toEntity(userRepository, boardRepository);
+    public ChatRoomResponseDto save(Long userId1, Long userId2, ChatRoomRequestDto chatRoomRequestDto) {
+
+        UserEntity user1 = userRepository.findById(userId1)
+                .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다."));
+
+        UserEntity user2 = userRepository.findById(userId2)
+                .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다."));
+
+        ChatRoomEntity chatRoomEntity = chatRoomRequestDto.toEntity(user1, user2);
         chatRoomRepository.save(chatRoomEntity);
 
 

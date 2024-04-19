@@ -63,7 +63,7 @@ public class ChatController {
         String jwtToken = authorizationHeader.substring(7);
         Long userId2 = jwtUtil.getUserId(jwtToken);
         Long userId1 = boardService.getBoard(boardId).getUserId();
-        String boardName = boardService.getBoard(boardId).getName();
+        String boardName = boardService.getBoard(boardId).getTitle();
 
         // 이미 있는 채팅방이 있다면 반환
         ChatRoomResponseDto existingChatRoom = chatRoomService.findChatRoomByUsersAndBoardId(userId1, userId2, boardId);
@@ -73,7 +73,7 @@ public class ChatController {
 
         // 새 채팅방 생성 후 반환
         ChatRoomRequestDto chatRoomRequestDto = new ChatRoomRequestDto(userId1,userId2,boardId,boardName);
-        ChatRoomResponseDto chatRoomResponseDto = chatRoomService.save(userId2, chatRoomRequestDto);
+        ChatRoomResponseDto chatRoomResponseDto = chatRoomService.save(userId1, userId2, chatRoomRequestDto);
         return new ResponseEntity<>(chatRoomResponseDto, HttpStatus.CREATED);
     }
 
