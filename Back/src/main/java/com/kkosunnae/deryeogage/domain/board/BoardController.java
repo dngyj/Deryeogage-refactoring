@@ -86,12 +86,9 @@ public class BoardController {
     ) {
         String jwtToken = authorizationHeader.substring(7);
         Long requestUserId = jwtUtil.getUserId(jwtToken);
+        Long writerId = boardService.getBoardWriterId(boardId);
 
-        //TODO: 메서드 가볍게 만들기 + 조건문 변경
-        BoardResponse thisBoard = boardService.getBoard(boardId, requestUserId);
-//       log.info("수정: 게시글 유저 정보 : " + thisBoard.getUserId());
-//       log.info("요청 유저 정보 : " + requestUserId);
-        if (thisBoard.getUserId() != requestUserId) {
+        if (writerId != requestUserId) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -124,9 +121,9 @@ public class BoardController {
         String jwtToken = authorizationHeader.substring(7);
         Long requestUserId = jwtUtil.getUserId(jwtToken);
 
-        //TODO: 메서드 가볍게 만들기 + 조건문 변경
-        BoardResponse thisBoard = boardService.getBoard(boardId, requestUserId);
-        if (thisBoard.getUserId() != requestUserId) {
+        Long writerId = boardService.getBoardWriterId(boardId);
+//        log.info("writerId: "+writerId);
+        if (writerId != requestUserId) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         // 해당 게시글이 가진 모든 파일을 리스트로 가져와서 삭제 수행

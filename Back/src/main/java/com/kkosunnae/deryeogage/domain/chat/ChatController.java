@@ -62,8 +62,12 @@ public class ChatController {
     public ResponseEntity<ChatRoomResponseDto> createRoom(@RequestHeader("Authorization") String authorizationHeader, @PathVariable Integer boardId) {
         String jwtToken = authorizationHeader.substring(7);
         Long userId2 = jwtUtil.getUserId(jwtToken);
-        Long userId1 = boardService.getBoard(boardId).getUserId();
-        String boardName = boardService.getBoard(boardId).getTitle();
+        //TODO: 채팅 테스트 및 객체 고민 해보자..
+        Object[] userIdAndTitle = boardService.getBoardWriterAndTitle(boardId);
+        Long userId1 = (Long) userIdAndTitle[0];
+        String boardName = (String) userIdAndTitle[1];
+//        Long userId1 = boardService.getBoard(boardId).getUserId();
+//        String boardName = boardService.getBoard(boardId).getTitle();
 
         // 이미 있는 채팅방이 있다면 반환
         ChatRoomResponseDto existingChatRoom = chatRoomService.findChatRoomByUsersAndBoardId(userId1, userId2, boardId);
