@@ -346,4 +346,17 @@ public class BoardService {
         }
     }
 
+    //게시글로 ID 조회
+    @Transactional(readOnly = true)
+    public Long getBoardWriterId(Integer boardId) {
+        return boardRepository.findUserIdByBoardId(boardId)
+                .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다. boardId: " + boardId));
+    }
+
+    //게시글로 ID와 Title 조회
+    @Transactional(readOnly = true)
+    public Object[] getBoardWriterAndTitle(Integer boardId) {
+        return boardRepository.findUserIdAndTitleByBoardId(boardId)
+                .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다. boardId: " + boardId));
+    }
 }
