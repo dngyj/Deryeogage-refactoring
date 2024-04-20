@@ -32,7 +32,6 @@ public class ChatController {
     private final UserService userService;
     private final BoardService boardService;
 
-    private final S3FileService s3FileService;
 
     //스케쥴 잡기, 수정, 삭제
     @PutMapping("/room/{roomId}/schedule")
@@ -152,7 +151,7 @@ public class ChatController {
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
-    //채팅방 밖에서 안 읽은 메시지 수
+    //채팅방 밖에서 안 읽은 메시지
     @GetMapping("/room/{id}/nonreadcount")
     public Integer getNonReadCount(@RequestHeader("Authorization") String authorizationHeader, @PathVariable Integer id){
         String jwtToken = authorizationHeader.substring(7);
