@@ -42,9 +42,7 @@ public class BoardRequest {
     private boolean isAdopter;
     private AdoptStatus status;
 
-    public BoardEntity toEntity(UserRepository userRepository){
-        UserEntity user = userRepository.findById(this.userId)
-                .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다. userId: " + userId));
+    public BoardEntity toEntity( UserEntity user){
         return BoardEntity.builder()
                 .user(user)
                 .regionCode(regionCode)
