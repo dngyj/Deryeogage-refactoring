@@ -23,19 +23,10 @@ public class JjimDto {
         this.boardId = boardId;
         this.userId = userId;
     }
-
-    public JjimEntity toEntity(BoardRepository boardRepository, UserRepository userRepository){
-
-        BoardEntity board = boardRepository.findById(this.boardId)
-                .orElseThrow(() -> new NoSuchElementException("해당 게시글이 존재하지 않습니다."));
-
-        UserEntity user = userRepository.findById(this.userId)
-                .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다."));
-
+    public JjimEntity toEntity(BoardEntity board, UserEntity user){
         return JjimEntity.builder()
                 .board(board)
                 .user(user)
                 .build();
     }
-
 }
