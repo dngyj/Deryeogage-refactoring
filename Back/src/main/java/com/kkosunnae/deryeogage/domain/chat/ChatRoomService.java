@@ -39,8 +39,6 @@ public class ChatRoomService {
         ChatRoomEntity chatRoomEntity = chatRoomRepository.findByUser1_IdAndUser2_IdAndBoardId(userId1, userId2, boardId);
 
         if (chatRoomEntity != null) {
-            // 여기에서 ChatRoomEntity를 ChatRoomResponseDto로 변환하는 로직이 필요할 수 있습니다.
-            // 예를 들어, new ChatRoomResponseDto(chatRoomEntity)와 같이 생성자를 사용할 수 있습니다.
             ChatRoomResponseDto chatRoomResponseDto = new ChatRoomResponseDto(chatRoomEntity);
             chatRoomResponseDto.setRoomName(boardRepository.findById(boardId).get().getTitle());
             return chatRoomResponseDto;
