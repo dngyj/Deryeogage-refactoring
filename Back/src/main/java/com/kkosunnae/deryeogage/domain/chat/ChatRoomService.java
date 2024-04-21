@@ -39,7 +39,8 @@ public class ChatRoomService {
         ChatRoomEntity chatRoomEntity = chatRoomRepository.findByUser1_IdAndUser2_IdAndBoardId(userId1, userId2, boardId);
 
         if (chatRoomEntity != null) {
-            ChatRoomResponseDto chatRoomResponseDto = new ChatRoomResponseDto(chatRoomEntity);
+            ChatRoomResponseDto chatRoomResponseDto = chatRoomEntity.toResponseDto();
+//            ChatRoomResponseDto chatRoomResponseDto = new ChatRoomResponseDto(chatRoomEntity);
             chatRoomResponseDto.setRoomName(boardRepository.findById(boardId).get().getTitle());
             return chatRoomResponseDto;
         }
@@ -55,8 +56,8 @@ public class ChatRoomService {
             if(chatMessageRepository.findByChatRoomId(chatRoomEntity.getId()).size()==0) continue;
 
 
-
-            ChatRoomResponseDto chatRoomResponseDto = new ChatRoomResponseDto(chatRoomEntity);
+            ChatRoomResponseDto chatRoomResponseDto = chatRoomEntity.toResponseDto();
+//            ChatRoomResponseDto chatRoomResponseDto = new ChatRoomResponseDto(chatRoomEntity);
             // 현재 사용자가 입양자면 날짜잡기가 가능하게
             if(chatRoomEntity.getUser2() != null && chatRoomEntity.getUser2().getId().equals(userId)) {
                 chatRoomResponseDto.setSchedule(true);
@@ -90,7 +91,8 @@ public class ChatRoomService {
         List<ChatRoomResponseDto> chatRoomResponseDtoList=new ArrayList<>();
         for(ChatRoomEntity chatRoomEntity : chatRooms){
             if(chatMessageRepository.findByChatRoomId(chatRoomEntity.getId()).size()==0) continue;
-            ChatRoomResponseDto chatRoomResponseDto = new ChatRoomResponseDto(chatRoomEntity);
+//            ChatRoomResponseDto chatRoomResponseDto = new ChatRoomResponseDto(chatRoomEntity);
+            ChatRoomResponseDto chatRoomResponseDto = chatRoomEntity.toResponseDto();
             // 현재 사용자가 입양자면 날짜잡기가 가능하게
             if(chatRoomEntity.getUser2() != null && chatRoomEntity.getUser2().getId().equals(userId)) {
                 chatRoomResponseDto.setSchedule(true);
@@ -142,7 +144,8 @@ public class ChatRoomService {
     public ChatRoomResponseDto findById(Long userId, final Integer id) {
         ChatRoomEntity entity = this.chatRoomRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("해당 ChatRoom이 존재하지 않습니다. id = " + id));
-        ChatRoomResponseDto chatRoomResponseDto = new ChatRoomResponseDto(entity);
+        ChatRoomResponseDto chatRoomResponseDto = entity.toResponseDto();
+//        ChatRoomResponseDto chatRoomResponseDto = new ChatRoomResponseDto(entity);
         // 현재 사용자가 입양자면 날짜잡기가 가능하게
         if(entity.getUser2() != null && entity.getUser2().getId().equals(userId)) {
             chatRoomResponseDto.setSchedule(true);

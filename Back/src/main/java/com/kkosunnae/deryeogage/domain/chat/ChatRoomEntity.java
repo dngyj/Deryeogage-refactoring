@@ -63,4 +63,13 @@ public class ChatRoomEntity extends BaseTime{
                 .scheduledDate(this.scheduledDate)
                 .build();
     }
+
+    public ChatRoomResponseDto toResponseDto(){
+        return ChatRoomResponseDto.builder()
+                .id(this.id)
+                .boardId(this.boardId)
+                .roomName(this.roomName)
+                .scheduledDate(this.scheduledDate)
+                .build();
+    }
 }
