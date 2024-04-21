@@ -32,7 +32,6 @@ public class ChatController {
     private final UserService userService;
     private final BoardService boardService;
 
-    private final S3FileService s3FileService;
 
     //스케쥴 잡기, 수정, 삭제
     @PutMapping("/room/{roomId}/schedule")
@@ -43,17 +42,17 @@ public class ChatController {
 
     //스케줄 존재여부 확인
     @GetMapping("/room/{roomId}/schedule")
-    public Response<Object> getExist(@PathVariable Integer roomId){
-       boolean exist = chatRoomService.getExist(roomId);
-        return Response.success(exist);
+    public ResponseEntity<?> getExist(@PathVariable Integer roomId){
+       boolean isExist = chatRoomService.getExist(roomId);
+        return new ResponseEntity<>(isExist, HttpStatus.OK);
     }
 
     // chatRoom 정보 조회
     @GetMapping("/room/info/{id}")
-    public Response<Object> getRoomInfo(@PathVariable Integer id){
+    public ResponseEntity<?> getRoomInfo(@PathVariable Integer id){
         log.info("chat 컨트롤러 roomId"+id);
-        ChatRoomDto chatRoomInfo = chatRoomService.getRoomInfo(id);
-        return Response.success(chatRoomInfo);
+        ChatRoomDto response = chatRoomService.getRoomInfo(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
@@ -86,7 +85,6 @@ public class ChatController {
     public ResponseEntity<List<ChatRoomResponseDto>> getAllRooms(@RequestHeader("Authorization") String authorizationHeader) {
         String jwtToken = authorizationHeader.substring(7);
         Long userId = jwtUtil.getUserId(jwtToken);
-
 
         List<ChatRoomResponseDto> chatRoomResponseDtoList = chatRoomService.findAll(userId);
         return new ResponseEntity<>(chatRoomResponseDtoList, HttpStatus.OK);
@@ -153,7 +151,7 @@ public class ChatController {
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
-    //채팅방 밖에서 안 읽은 메시지 수
+    //채팅방 밖에서 안 읽은 메시지
     @GetMapping("/room/{id}/nonreadcount")
     public Integer getNonReadCount(@RequestHeader("Authorization") String authorizationHeader, @PathVariable Integer id){
         String jwtToken = authorizationHeader.substring(7);

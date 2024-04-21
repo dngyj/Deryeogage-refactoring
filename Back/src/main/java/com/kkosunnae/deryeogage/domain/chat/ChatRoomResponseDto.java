@@ -1,5 +1,6 @@
 package com.kkosunnae.deryeogage.domain.chat;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter
+@Builder
 public class ChatRoomResponseDto {
     private Integer id;
     private String roomName;
@@ -25,11 +27,11 @@ public class ChatRoomResponseDto {
 
     private Integer boardId;
 
-    public ChatRoomResponseDto(ChatRoomEntity entity) {
-        this.id = entity.getId();
-        this.roomName = entity.getRoomName();
-        this.createdDate = entity.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
-        this.updatedDate = entity.getUpdatedDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
-        this.schedule = false;
-    }
+//    public ChatRoomResponseDto() {
+//        this.id = chatRoom.getId();
+//        this.roomName = chatRoom.getRoomName();
+//        this.createdDate = chatRoom.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
+//        this.updatedDate = chatRoom.getUpdatedDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
+//        this.schedule = false;
+//    }
 }

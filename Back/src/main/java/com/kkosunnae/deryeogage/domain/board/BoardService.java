@@ -35,15 +35,14 @@ public class BoardService {
     //게시글 작성
     @Transactional
     public int save(BoardRequest request, Long userId) {
-//        log.info("게시글 제목 : ", request.getTitle());
-
         request.setCreatedDate(LocalDateTime.now());
         request.setUserId(userId);
 
-        Optional<UserEntity> user = userRepository.findById(request.getUserId());
-        request.setUserNickname(user.get().getNickname());
-//      log.info("user 닉네임게시글작성서비스: " + user.get().getNickname());
-        BoardEntity board = boardRepository.save(request.toEntity(userRepository));
+        UserEntity user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다. userId: " + userId));
+        request.setUserNickname(user.getNickname());
+
+        BoardEntity board = boardRepository.save(request.toEntity(user));
         return board.getId();
     }
 
@@ -212,8 +211,15 @@ public class BoardService {
     //게시글 찜
     @Transactional
     public int like(JjimDto jjimDto) {
+        BoardEntity board = boardRepository.findById(jjimDto.getBoardId())
+                .orElseThrow(() -> new NoSuchElementException("해당 게시글이 존재하지 않습니다."));
+
+        UserEntity user = userRepository.findById(jjimDto.getUserId())
+                .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다."));
+
         if (!jjimRepository.existsByUserIdAndBoardId(jjimDto.getUserId(), jjimDto.getBoardId())) {
-            JjimEntity jjim = jjimRepository.save(jjimDto.toEntity(boardRepository, userRepository));
+
+            JjimEntity jjim = jjimRepository.save(jjimDto.toEntity(board, user));
             return jjim.getId();
         }//만약 이미 찜한 게시글이라면
         else throw new IllegalArgumentException("이미 찜한 게시판입니다.");
