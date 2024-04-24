@@ -68,7 +68,7 @@ class ChatControllerTests {
 //        ChatRoomResponseDto chatRoomResponseDto = chatRoomEntity.toResponseDto();
 //        ChatRoomResponseDto chatRoomResponseDto = new ChatRoomResponseDto();
         when(chatRoomService.findChatRoomByUsersAndBoardId(userId1, userId2, boardId)).thenReturn(null);
-        when(chatRoomService.save(userId1, userId2, new ChatRoomRequestDto(userId1, userId2, boardId, boardName))).thenReturn(chatRoomResponseDto);
+//        when(chatRoomService.save(userId1, userId2, new ChatRoomRequestDto(userId1, userId2, boardId, boardName))).thenReturn(chatRoomResponseDto);
 
         mockMvc.perform(post("/api/chat/room/{boardId}", boardId)
                         .header("Authorization", jwtToken)
