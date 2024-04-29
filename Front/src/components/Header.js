@@ -106,7 +106,7 @@ function Header() {
             Authorization: `Bearer ${token}`,
           },
         });
-        setpostcostdata(response.data.data)
+        setpostcostdata(response.data)
       } catch (error) {
         console.error("An error occurred while fetching the data:", error);
       }

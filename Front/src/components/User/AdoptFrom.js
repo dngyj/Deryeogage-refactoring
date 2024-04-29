@@ -114,7 +114,7 @@ function AdoptFrom() {
             Authorization: `Bearer ${token}`,
           },
         });
-        setPrecost(response.data.data);
+        setPrecost(response.data);
       } catch (error) {
         console.error("An error occurred while fetching the data:", error);
       }

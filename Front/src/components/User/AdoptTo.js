@@ -157,7 +157,7 @@ function AdoptTo() {
             Authorization: `Bearer ${token}`,
           },
         });
-        setPostCost(response.data.data)
+        setPostCost(response.data)
       } catch (error) {
         console.error("An error occurred while fetching the data:", error);
       }
