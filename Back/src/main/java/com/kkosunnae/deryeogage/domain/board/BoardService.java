@@ -35,11 +35,11 @@ public class BoardService {
     //게시글 작성
     @Transactional
     public int save(BoardRequest request, Long userId) {
-        request.setCreatedDate(LocalDateTime.now());
-        request.setUserId(userId);
-
         UserEntity user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다. userId: " + userId));
+
+        request.setCreatedDate(LocalDateTime.now());
+        request.setUserId(userId);
         request.setUserNickname(user.getNickname());
 
         BoardEntity board = boardRepository.save(request.toEntity(user));
@@ -49,11 +49,12 @@ public class BoardService {
 
     //게시글 수정
     @Transactional
-    public int update(Integer id, BoardRequest request) {
+    public int update(Integer id, BoardRequest request, Long requestUserId) {
         BoardEntity board = boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 유저의 게시글이 없습니다. id : " + id));
 
         Optional<UserEntity> user = userRepository.findById(request.getUserId());
         if (user.isPresent()) {
+            request.setUserId(requestUserId);
             request.setUserNickname(user.get().getNickname());
             request.setCreatedDate(LocalDateTime.now());
             board.update(request);

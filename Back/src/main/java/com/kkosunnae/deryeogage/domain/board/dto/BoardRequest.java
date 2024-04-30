@@ -65,9 +65,9 @@ public class BoardRequest {
                 .createdDate(createdDate)
                 .build();
     }
-
-//    public static BoardRequest from(BoardEntity board){
-//
+//    public BoardRequest setCreatedDate(LocalDateTime createdDate){
+//        this.createdDate=createdDate;
+//        return this;
 //    }
 
 }
