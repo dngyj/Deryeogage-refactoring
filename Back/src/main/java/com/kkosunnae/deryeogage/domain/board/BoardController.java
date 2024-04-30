@@ -91,10 +91,7 @@ public class BoardController {
         if (writerId != requestUserId) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
-        request.setUserId(requestUserId);
-
-        boardService.update(boardId, request);
+        boardService.update(boardId, request, requestUserId);
 
         if (multipartFile != null && !multipartFile.isEmpty()) {
             Map<String, List> nameList = s3FileService.uploadFile(multipartFile);
