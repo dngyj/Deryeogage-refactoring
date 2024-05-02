@@ -14,7 +14,6 @@ import java.util.NoSuchElementException;
 @Getter
 @Setter
 @NoArgsConstructor
-@Builder
 @AllArgsConstructor
 public class BoardRequest {
     private int id;
@@ -65,9 +64,19 @@ public class BoardRequest {
                 .createdDate(createdDate)
                 .build();
     }
-//    public BoardRequest setCreatedDate(LocalDateTime createdDate){
-//        this.createdDate=createdDate;
-//        return this;
-//    }
+    public BoardRequest setCreatedDate(LocalDateTime createdDate){
+        this.createdDate=createdDate;
+        return this;
+    }
+
+    public BoardRequest setUserId(Long userId){
+        this.userId=userId;
+        return this;
+    }
+
+    public BoardRequest setUserNickname(String userNickname){
+        this.userNickname=userNickname;
+        return this;
+    }
 
 }
