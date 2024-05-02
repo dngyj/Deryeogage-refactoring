@@ -42,7 +42,7 @@ public class BoardController {
 //        stopWatch.start("saveBoardController");
         String jwtToken = authorizationHeader.substring(7);
         Long userId = jwtUtil.getUserId(jwtToken);
-        Integer boardId = boardService.save(request , userId);
+        Integer boardId = boardService.save(request, userId);
         // 원본 파일명과 S3에 저장된 파일명이 담긴 Map
         Map<String, List> nameList = s3FileService.uploadFile(multipartFile);
         // DB에 파일이름 저장

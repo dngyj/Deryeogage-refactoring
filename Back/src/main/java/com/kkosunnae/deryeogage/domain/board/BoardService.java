@@ -35,7 +35,7 @@ public class BoardService {
     //게시글 작성
     @Transactional
     public int save(BoardRequest request, Long userId) {
-        UserEntity user = userRepository.findById(request.getUserId())
+        UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다. userId: " + userId));
 
         request.setCreatedDate(LocalDateTime.now());
