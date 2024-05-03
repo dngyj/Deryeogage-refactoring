@@ -258,8 +258,11 @@ function AdoptBoardCreate() {
   
 
     if (isEditing) {
-      const imagesJSON = JSON.stringify(selectedImages);
-      formData.append("multipartFile", imagesJSON);
+      selectedImageFiles.forEach((image) => {
+        formData.append("multipartFile", image);
+      });
+      // const imagesJSON = JSON.stringify(selectedImages);
+      // formData.append("multipartFile", imagesJSON);
     }
 
     // 비디오 파일들 추가
@@ -321,7 +324,7 @@ function AdoptBoardCreate() {
         );
         sessionStorage.removeItem("adoptData");
 
-        const newBoardId = response.data; // 서버의 응답 형식에 따라 이 부분이 수정되어야 할 수 있습니다.
+        const newBoardId = response.data;
         handlePrecostOpen(newBoardId); // 작성하기 버튼 클릭 시 모달 열기
       }
     } catch (error) {
