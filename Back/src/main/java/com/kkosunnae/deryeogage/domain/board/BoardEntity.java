@@ -179,6 +179,7 @@ public class BoardEntity {
                 .userNickname(this.userNickname)
                 .title(this.title)
                 .name(this.name)
+                .age(this.age)
                 .createdDate(this.createdDate)
                 .build();
     }
