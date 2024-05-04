@@ -4,6 +4,7 @@ import com.kkosunnae.deryeogage.domain.adopt.AdoptEntity;
 import com.kkosunnae.deryeogage.domain.adopt.AdoptRepository;
 import com.kkosunnae.deryeogage.domain.board.dto.BoardRequest;
 import com.kkosunnae.deryeogage.domain.board.dto.BoardResponse;
+import com.kkosunnae.deryeogage.domain.board.dto.GetBoardListResponse;
 import com.kkosunnae.deryeogage.global.s3file.S3FileService;
 import com.kkosunnae.deryeogage.global.util.JwtUtil;
 import io.swagger.annotations.Api;
@@ -136,7 +137,7 @@ public class BoardController {
     public ResponseEntity<?> findBoards() {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start("findAllBoardController");
-        List<BoardResponse> boardSetList = boardService.findAll();
+        List<GetBoardListResponse> boardSetList = boardService.findAll();
         stopWatch.stop();
         log.info(stopWatch.prettyPrint());
         log.info("코드 실행 시간 (s): " + stopWatch.getTotalTimeSeconds());
