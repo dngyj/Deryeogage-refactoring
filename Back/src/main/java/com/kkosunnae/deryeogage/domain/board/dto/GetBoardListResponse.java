@@ -21,6 +21,7 @@ public class GetBoardListResponse {
     private String userNickname;
     private String title;
     private String name;
+    private byte age;
     private LocalDateTime createdDate;
     private List fileList;
     private AdoptStatus status;
@@ -34,6 +35,7 @@ public class GetBoardListResponse {
                 .userNickname(userNickname)
                 .title(title)
                 .name(name)
+                .age(age)
                 .createdDate(createdDate)
                 .build();
     }

@@ -19,7 +19,7 @@ function MyAdopt() {
           },
         });
 
-        setPosts(response.data.data);
+        setPosts(response.data);
       } catch (error) {
         console.error("고장 -0-", error);
       }
