@@ -51,7 +51,7 @@ public class UserService {
 
             // POST 요청에 필요한 파라미터를 스트림을 통해 전송
             BufferedWriter bw = new BufferedWriter((new OutputStreamWriter(conn.getOutputStream())));
-            StringBuilder sb = new StringBuilder();
+            StringBuffer sb = new StringBuffer();
             sb.append("grant_type=authorization_code");
             sb.append("&client_id=b1693871444633df1bafc742a4a571c7"); //현재 프론트 서버
             // 로컬용 주소
