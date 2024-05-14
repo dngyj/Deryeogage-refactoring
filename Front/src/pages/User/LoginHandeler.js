@@ -29,7 +29,7 @@ const LoginHandeler = () => {
         .then((res) => {
           //백에서 완료후 우리사이트 전용 토큰 넘겨주는게 성공했다면
           //계속 쓸 정보들( ex: 이름) 등은 localStorage에 저장해두자
-          localStorage.setItem("accessToken", res.data.data.accessToken);
+          localStorage.setItem("accessToken", res.data.accessToken);
 
           //로그인이 성공하면 이동할 페이지
           getNickname();
@@ -53,7 +53,7 @@ const LoginHandeler = () => {
       },
     })
       .then((res) => {
-        localStorage.setItem("nickname", res.data.data);
+        localStorage.setItem("nickname", res.data);
         navigate(redirectPath); // 저장된 경로로 이동
         localStorage.removeItem("redirect"); // 경로 정보 삭제
       })
