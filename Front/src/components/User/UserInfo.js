@@ -30,7 +30,7 @@ function UserInfo() {
           },
         }
       );
-      setUserInfo(response.data.data);
+      setUserInfo(response.data);
     } catch (error) {
       console.error("Failed to fetch user profile:", error);
     }
@@ -49,7 +49,7 @@ function UserInfo() {
             },
           }
         );
-        setUserInfo(response.data.data); // userInfo 상태 업데이트
+        setUserInfo(response.data); // userInfo 상태 업데이트
       } catch (error) {
         console.error("Failed to fetch user profile:", error);
       }

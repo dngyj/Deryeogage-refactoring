@@ -56,57 +56,57 @@ public class UserController {
         return new ResponseEntity<>(nickname,HttpStatus.OK);
     }
 
+    /** 프로필 수정 페이지 **/
     //현재 로그인된 사용자의 프로필 사진 저장
     @PostMapping("/pic")
-    public Response<Object> savePicture(@RequestHeader("Authorization") String authorizationHeader, @RequestPart("multipartFile") List<MultipartFile> multipartFile){
+    public ResponseEntity<?> savePicture(@RequestHeader("Authorization") String authorizationHeader, @RequestPart("multipartFile") List<MultipartFile> multipartFile){
         String jwtToken = authorizationHeader.substring(7);
         Long userId = jwtUtil.getUserId(jwtToken);
 
         Map<String, List> nameList = s3FileService.uploadFile(multipartFile);
         String path = userService.savePicture(userId, nameList);
 
-        return Response.success(path);
+        return new ResponseEntity<>(path,HttpStatus.OK);
     }
 
     //현재 로그인된 사용자의 프로필 사진 조회
     @GetMapping("/pic")
-    public Response<Object> getPicture(@RequestHeader("Authorization") String authorizationHeader){
+    public ResponseEntity<?> getPicture(@RequestHeader("Authorization") String authorizationHeader){
         String jwtToken = authorizationHeader.substring(7);
         Long userId = jwtUtil.getUserId(jwtToken);
 
         String path = userService.getPicture(userId);
-        return Response.success(path);
+        return new ResponseEntity<>(path,HttpStatus.OK);
     }
 
     //로그인한 사용자의 프로필 사진 수정
     @PutMapping("/pic")
-    public Response<Object> updatePicture(@RequestHeader("Authorization") String authorizationHeader, @RequestPart("multipartFile") List<MultipartFile> multipartFile){
+    public ResponseEntity<?> updatePicture(@RequestHeader("Authorization") String authorizationHeader, @RequestPart("multipartFile") List<MultipartFile> multipartFile){
         String jwtToken = authorizationHeader.substring(7);
         Long userId = jwtUtil.getUserId(jwtToken);
         Map<String, List> nameList = s3FileService.uploadFile(multipartFile);
 
-
         String newPath = userService.updatePicture(userId, nameList);
 
-        return Response.success(newPath);
+        return new ResponseEntity<>(newPath,HttpStatus.OK);
     }
 
     /** 입양게시판 및 채팅 화면에서 타인 닉네임 클릭 시
      * 게시판 및 채팅 entity에 담겨 있는 사용자 id를 활용 **/
     @GetMapping("/profile")
-    public Response<Object> getProfile(@RequestHeader("userId") Long userId){
+    public ResponseEntity<?> getProfile(@RequestHeader("userId") Long userId){
         ProfileResponseDto profileResponse = userService.getProfile(userId);
-        return Response.success(profileResponse);
+        return new ResponseEntity<>(profileResponse, HttpStatus.OK);
     }
 
 
     /** 마이페이지에 내 프로필 정보 반환 **/
     @GetMapping("/profile/mypage")
-    public Response<Object> getProfile(@RequestHeader("Authorization") String authorizationHeader){
+    public ResponseEntity<?> getProfile(@RequestHeader("Authorization") String authorizationHeader){
         String jwtToken = authorizationHeader.substring(7);
         Long userId = jwtUtil.getUserId(jwtToken);
 
         ProfileResponseDto profileResponse = userService.getProfile(userId);
-        return Response.success(profileResponse);
+        return new ResponseEntity<>(profileResponse,HttpStatus.OK);
     }
 }
