@@ -148,11 +148,11 @@ public class UserService {
             userInfo.setCreatedDate(LocalDateTime.now());
             userInfo.setNickname(profile.getAsJsonObject().get("nickname").getAsString());
 
-            //카카오 제공 사용자 정보 확인
-            System.out.println("userInfo.id = " + userInfo.getId());
-            System.out.println("userInfo.nickname = " + userInfo.getNickname());
-            System.out.println("userInfo.age_range = " + userInfo.getAgeRange());
-            System.out.println("userInfo.created_date = " + userInfo.getCreatedDate());
+//            //카카오 제공 사용자 정보 확인
+//            System.out.println("userInfo.id = " + userInfo.getId());
+//            System.out.println("userInfo.nickname = " + userInfo.getNickname());
+//            System.out.println("userInfo.age_range = " + userInfo.getAgeRange());
+//            System.out.println("userInfo.created_date = " + userInfo.getCreatedDate());
 
 
             // 디비에서 확인하고
