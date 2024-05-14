@@ -17,7 +17,7 @@ function UserProfile({ data }) {
             Authorization: `Bearer ${token}`,
           },
         });
-        setUserInfo(response.data.data); // userInfo 상태 업데이트
+        setUserInfo(response.data); // userInfo 상태 업데이트
       } catch (error) {
         console.error("Failed to fetch user profile:", error);
       }
