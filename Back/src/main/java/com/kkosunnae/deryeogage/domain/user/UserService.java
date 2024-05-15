@@ -178,9 +178,9 @@ public class UserService {
     // 로그인한 사용자의 닉네임 가져오기
     @Transactional(readOnly = true)
     public String getUserNickname(Long userId) {
-
-        UserEntity loginedUser = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("사용자가 존재하지 않습니다."));
+        UserEntity loginedUser = findUsersById(userId);
+//        UserEntity loginedUser = userRepository.findById(userId)
+//                .orElseThrow(() -> new NoSuchElementException("사용자가 존재하지 않습니다."));
 
         String nickname = loginedUser.getNickname();
         return nickname;
@@ -189,8 +189,9 @@ public class UserService {
     // 로그인한 사용자의 프로필 사진 등록
     public String savePicture(Long userId, Map<String, List> nameList) {
 
-        UserEntity userEntity = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다. userId" + userId));
+        UserEntity userEntity = findUsersById(userId);
+//        UserEntity userEntity = userRepository.findById(userId)
+//                .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다. userId" + userId));
 
         List<String> savedPaths = nameList.get("path");
         String path = savedPaths.get(0);
@@ -201,8 +202,9 @@ public class UserService {
     // 로그인한 사용자의 프로필 사진 조회
     @Transactional(readOnly = true)
     public String getPicture(Long userId) {
-        UserEntity userEntity = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다. userId" + userId));
+        UserEntity userEntity = findUsersById(userId);
+//        UserEntity userEntity = userRepository.findById(userId)
+//                .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다. userId" + userId));
 
         UserDto userDto = userEntity.toDto();
 
@@ -214,8 +216,9 @@ public class UserService {
 
     // 로그인한 사용자의 프로필 사진 수정
     public String updatePicture(Long userId, Map<String, List> nameList) {
-        UserEntity userEntity = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다. userId" + userId));
+        UserEntity userEntity = findUsersById(userId);
+//        UserEntity userEntity = userRepository.findById(userId)
+//                .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다. userId" + userId));
 
         List<String> updatedPaths = nameList.get("path");
         String newPath = updatedPaths.get(0);
@@ -229,8 +232,9 @@ public class UserService {
     public ProfileResponseDto getProfile(Long userId) {
 
         // 사용자
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
+        UserEntity user = findUsersById(userId);
+//        UserEntity user = userRepository.findById(userId)
+//                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
 
         // 사전 테스트
         Optional<PreTestEntity> pretest = preTestRepository.findByUserId(userId);
@@ -275,4 +279,10 @@ public class UserService {
 
         return profile;
     }
+
+    private UserEntity findUsersById(Long userId){
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다. userId: "+userId));
+    }
+
 }

@@ -135,12 +135,12 @@ public class BoardController {
     //글 목록 조회
     @GetMapping("/list")
     public ResponseEntity<?> findBoards() {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start("findAllBoardController");
+//        StopWatch stopWatch = new StopWatch();
+//        stopWatch.start("findAllBoardController");
         List<GetBoardListResponse> boardSetList = boardService.findAll();
-        stopWatch.stop();
-        log.info(stopWatch.prettyPrint());
-        log.info("코드 실행 시간 (s): " + stopWatch.getTotalTimeSeconds());
+//        stopWatch.stop();
+//        log.info(stopWatch.prettyPrint());
+//        log.info("코드 실행 시간 (s): " + stopWatch.getTotalTimeSeconds());
         return new ResponseEntity<>(boardSetList,HttpStatus.OK);
     }
 
