@@ -8,8 +8,10 @@ import com.kkosunnae.deryeogage.domain.board.dto.BoardResponse;
 import com.kkosunnae.deryeogage.domain.board.dto.GetBoardListResponse;
 import com.kkosunnae.deryeogage.domain.survey.SurveyEntity;
 import com.kkosunnae.deryeogage.domain.survey.SurveyRepository;
+import com.kkosunnae.deryeogage.domain.user.UserCacheService;
 import com.kkosunnae.deryeogage.domain.user.UserEntity;
 import com.kkosunnae.deryeogage.domain.user.UserRepository;
+import com.kkosunnae.deryeogage.domain.user.UserService;
 import com.kkosunnae.deryeogage.global.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,12 +34,13 @@ public class BoardService {
     private final BoardFileRepository boardFileRepository;
     private final SurveyRepository surveyRepository;
     private final AdoptRepository adoptRepository;
+    private final UserService userService;
+    private final UserCacheService userCacheService;
 
     //게시글 작성
     @Transactional
     public int save(BoardRequest request, Long userId) {
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다. userId: " + userId));
+        UserEntity user = userCacheService.findUsersById(userId);
 
         request.setCreatedDate(LocalDateTime.now());
         request.setUserId(userId);
@@ -75,7 +78,7 @@ public class BoardService {
     @Transactional(readOnly = true)
     public BoardResponse getBoard(Integer boardId, Long userId) {
         BoardEntity board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다. boardId: "+ boardId));
 
         BoardResponse response = board.from();
         Optional<AdoptEntity> adopt = adoptRepository.findByBoardId(boardId);
@@ -208,9 +211,7 @@ public class BoardService {
     public int like(JjimDto jjimDto) {
         BoardEntity board = boardRepository.findById(jjimDto.getBoardId())
                 .orElseThrow(() -> new NoSuchElementException("해당 게시글이 존재하지 않습니다."));
-
-        UserEntity user = userRepository.findById(jjimDto.getUserId())
-                .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다."));
+        UserEntity user =userCacheService.findUsersById(jjimDto.getUserId());
 
         if (!jjimRepository.existsByUserIdAndBoardId(jjimDto.getUserId(), jjimDto.getBoardId())) {
 

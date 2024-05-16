@@ -62,6 +62,11 @@ dependencies {
 
 	//redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// Jackson이 Java 8의 java.time.LocalDateTime 유형을 처리
+	runtimeOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+	implementation ("com.fasterxml.jackson.core:jackson-databind")
 }
 
 //jacoco 테스트

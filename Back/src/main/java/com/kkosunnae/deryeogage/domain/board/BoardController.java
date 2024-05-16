@@ -118,7 +118,6 @@ public class BoardController {
     ) {
         String jwtToken = authorizationHeader.substring(7);
         Long requestUserId = jwtUtil.getUserId(jwtToken);
-
         Long writerId = boardService.getBoardWriterId(boardId);
 //        log.info("writerId: "+writerId);
         if (writerId != requestUserId) {
@@ -135,12 +134,12 @@ public class BoardController {
     //글 목록 조회
     @GetMapping("/list")
     public ResponseEntity<?> findBoards() {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start("findAllBoardController");
+//        StopWatch stopWatch = new StopWatch();
+//        stopWatch.start("findAllBoardController");
         List<GetBoardListResponse> boardSetList = boardService.findAll();
-        stopWatch.stop();
-        log.info(stopWatch.prettyPrint());
-        log.info("코드 실행 시간 (s): " + stopWatch.getTotalTimeSeconds());
+//        stopWatch.stop();
+//        log.info(stopWatch.prettyPrint());
+//        log.info("코드 실행 시간 (s): " + stopWatch.getTotalTimeSeconds());
         return new ResponseEntity<>(boardSetList,HttpStatus.OK);
     }
 
