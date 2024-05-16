@@ -1,5 +1,7 @@
 package com.kkosunnae.deryeogage.domain.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.kkosunnae.deryeogage.domain.adopt.AdoptEntity;
 import com.kkosunnae.deryeogage.domain.board.BoardEntity;
 import com.kkosunnae.deryeogage.domain.board.JjimEntity;
@@ -18,6 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +29,14 @@ import java.util.List;
 @Getter
 @Table(name = "user")
 @NoArgsConstructor
-public class UserEntity {
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@class"
+)
+public class UserEntity implements Serializable {
+//    private static final long serialVersionUID = 1L;
+
     @Id
     private Long id;
 
@@ -41,49 +51,62 @@ public class UserEntity {
 
     @Column(name="created_date")
     private LocalDateTime createdDate;
-
+    @JsonIgnore
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private SurveyEntity survey;
-
+    @JsonIgnore
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private PreTestEntity preTest;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<ReviewEntity> reviews = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<ReviewCommentEntity> reviewComments = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<SimulationEntity> simulations = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user1")
     private List<ChatRoomEntity> user1ChatRooms = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user2")
     private List<ChatRoomEntity> user2ChatRooms = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<ChatMessageEntity> chatMessages = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<JjimEntity> jjims = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<BoardEntity> boards = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "fromUser")
     private List<AdoptEntity> fromUserAdopts = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "toUser")
     private List<AdoptEntity> toUserAdopts = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<PostCostEntity> postCosts = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<PreCostEntity> preCosts = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<MissionEntity> missions = new ArrayList<>();
 

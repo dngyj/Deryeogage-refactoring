@@ -118,7 +118,6 @@ public class BoardController {
     ) {
         String jwtToken = authorizationHeader.substring(7);
         Long requestUserId = jwtUtil.getUserId(jwtToken);
-
         Long writerId = boardService.getBoardWriterId(boardId);
 //        log.info("writerId: "+writerId);
         if (writerId != requestUserId) {

@@ -11,8 +11,10 @@ import com.kkosunnae.deryeogage.domain.simulation.SimulationRepository;
 import com.kkosunnae.deryeogage.domain.simulation.SimulationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StopWatch;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -33,6 +35,7 @@ public class UserService {
     private final PreTestRepository preTestRepository;
     private final SimulationService simulationService;
     private final AdoptRepository adoptRepository;
+    private final UserCacheService userCacheService;
 
 
     @Transactional(readOnly = true)
@@ -178,20 +181,21 @@ public class UserService {
     // 로그인한 사용자의 닉네임 가져오기
     @Transactional(readOnly = true)
     public String getUserNickname(Long userId) {
-        UserEntity loginedUser = findUsersById(userId);
-//        UserEntity loginedUser = userRepository.findById(userId)
-//                .orElseThrow(() -> new NoSuchElementException("사용자가 존재하지 않습니다."));
 
-        String nickname = loginedUser.getNickname();
+//        StopWatch stopWatch = new StopWatch();
+//        stopWatch.start("findUserById: redis 캐시 접근");
+        UserEntity user = userCacheService.findUsersById(userId);
+//        stopWatch.stop();
+//        log.info("코드 실행 시간 (s): " + stopWatch.getTotalTimeSeconds());
+//        log.info(stopWatch.prettyPrint());
+        String nickname = user.getNickname();
         return nickname;
     }
 
     // 로그인한 사용자의 프로필 사진 등록
     public String savePicture(Long userId, Map<String, List> nameList) {
 
-        UserEntity userEntity = findUsersById(userId);
-//        UserEntity userEntity = userRepository.findById(userId)
-//                .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다. userId" + userId));
+        UserEntity userEntity = userCacheService.findUsersById(userId);
 
         List<String> savedPaths = nameList.get("path");
         String path = savedPaths.get(0);
@@ -202,24 +206,17 @@ public class UserService {
     // 로그인한 사용자의 프로필 사진 조회
     @Transactional(readOnly = true)
     public String getPicture(Long userId) {
-        UserEntity userEntity = findUsersById(userId);
-//        UserEntity userEntity = userRepository.findById(userId)
-//                .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다. userId" + userId));
-
+        UserEntity userEntity = userCacheService.findUsersById(userId);
         UserDto userDto = userEntity.toDto();
 
         String path = userDto.getImageUrl();
-
         return path;
     }
 
 
     // 로그인한 사용자의 프로필 사진 수정
     public String updatePicture(Long userId, Map<String, List> nameList) {
-        UserEntity userEntity = findUsersById(userId);
-//        UserEntity userEntity = userRepository.findById(userId)
-//                .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다. userId" + userId));
-
+        UserEntity userEntity = userCacheService.findUsersById(userId);
         List<String> updatedPaths = nameList.get("path");
         String newPath = updatedPaths.get(0);
         userEntity.update(newPath);
@@ -232,10 +229,7 @@ public class UserService {
     public ProfileResponseDto getProfile(Long userId) {
 
         // 사용자
-        UserEntity user = findUsersById(userId);
-//        UserEntity user = userRepository.findById(userId)
-//                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
-
+        UserEntity user = userCacheService.findUsersById(userId);
         // 사전 테스트
         Optional<PreTestEntity> pretest = preTestRepository.findByUserId(userId);
 
@@ -280,9 +274,9 @@ public class UserService {
         return profile;
     }
 
-    public UserEntity findUsersById(Long userId){
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다. userId: "+userId));
-    }
-
+//    @Cacheable(key = "#userId", value="users")
+//    public UserEntity findUsersById(Long userId){
+//        return userRepository.findById(userId)
+//                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다. userId: "+userId));
+//    }
 }

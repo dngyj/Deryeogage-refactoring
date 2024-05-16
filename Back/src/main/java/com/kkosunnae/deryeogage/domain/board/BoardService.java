@@ -8,6 +8,7 @@ import com.kkosunnae.deryeogage.domain.board.dto.BoardResponse;
 import com.kkosunnae.deryeogage.domain.board.dto.GetBoardListResponse;
 import com.kkosunnae.deryeogage.domain.survey.SurveyEntity;
 import com.kkosunnae.deryeogage.domain.survey.SurveyRepository;
+import com.kkosunnae.deryeogage.domain.user.UserCacheService;
 import com.kkosunnae.deryeogage.domain.user.UserEntity;
 import com.kkosunnae.deryeogage.domain.user.UserRepository;
 import com.kkosunnae.deryeogage.domain.user.UserService;
@@ -34,11 +35,12 @@ public class BoardService {
     private final SurveyRepository surveyRepository;
     private final AdoptRepository adoptRepository;
     private final UserService userService;
+    private final UserCacheService userCacheService;
 
     //게시글 작성
     @Transactional
     public int save(BoardRequest request, Long userId) {
-        UserEntity user = userService.findUsersById(userId);
+        UserEntity user = userCacheService.findUsersById(userId);
 
         request.setCreatedDate(LocalDateTime.now());
         request.setUserId(userId);
@@ -209,7 +211,7 @@ public class BoardService {
     public int like(JjimDto jjimDto) {
         BoardEntity board = boardRepository.findById(jjimDto.getBoardId())
                 .orElseThrow(() -> new NoSuchElementException("해당 게시글이 존재하지 않습니다."));
-        UserEntity user = userService.findUsersById(jjimDto.getUserId());
+        UserEntity user =userCacheService.findUsersById(jjimDto.getUserId());
 
         if (!jjimRepository.existsByUserIdAndBoardId(jjimDto.getUserId(), jjimDto.getBoardId())) {
 
