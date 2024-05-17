@@ -22,6 +22,7 @@ import java.util.Map;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
+    private static final String BEARER_PREFIX = "Bearer ";
 
     private final JwtUtil jwtUtil;
     private final UserService userService;
@@ -37,7 +38,6 @@ public class UserController {
             String accessToken = userService.getAccessToken(code);
             Long userId = userService.regist(accessToken);
 
-
             // access 토큰 프론트에 반환
             Map<String, Object> userJwt = new HashMap<>();
             userJwt.put("accessToken", jwtUtil.createToken("claimUser", userId));
@@ -49,9 +49,7 @@ public class UserController {
     // 현재 로그인된 사용자 닉네임 반환
     @GetMapping
     public ResponseEntity<?> loginedUser(@RequestHeader("Authorization") String authorizationHeader) throws Exception {
-
-        String jwtToken = authorizationHeader.substring(7);
-        Long userId = jwtUtil.getUserId(jwtToken);
+        Long userId = findUserIdByJwt(authorizationHeader);
         String nickname = userService.getUserNickname(userId);
         return new ResponseEntity<>(nickname,HttpStatus.OK);
     }
@@ -60,9 +58,7 @@ public class UserController {
     //현재 로그인된 사용자의 프로필 사진 저장
     @PostMapping("/pic")
     public ResponseEntity<?> savePicture(@RequestHeader("Authorization") String authorizationHeader, @RequestPart("multipartFile") List<MultipartFile> multipartFile){
-        String jwtToken = authorizationHeader.substring(7);
-        Long userId = jwtUtil.getUserId(jwtToken);
-
+        Long userId = findUserIdByJwt(authorizationHeader);
         Map<String, List> nameList = s3FileService.uploadFile(multipartFile);
         String path = userService.savePicture(userId, nameList);
 
@@ -72,9 +68,7 @@ public class UserController {
     //현재 로그인된 사용자의 프로필 사진 조회
     @GetMapping("/pic")
     public ResponseEntity<?> getPicture(@RequestHeader("Authorization") String authorizationHeader){
-        String jwtToken = authorizationHeader.substring(7);
-        Long userId = jwtUtil.getUserId(jwtToken);
-
+        Long userId = findUserIdByJwt(authorizationHeader);
         String path = userService.getPicture(userId);
         return new ResponseEntity<>(path,HttpStatus.OK);
     }
@@ -82,12 +76,9 @@ public class UserController {
     //로그인한 사용자의 프로필 사진 수정
     @PutMapping("/pic")
     public ResponseEntity<?> updatePicture(@RequestHeader("Authorization") String authorizationHeader, @RequestPart("multipartFile") List<MultipartFile> multipartFile){
-        String jwtToken = authorizationHeader.substring(7);
-        Long userId = jwtUtil.getUserId(jwtToken);
+        Long userId = findUserIdByJwt(authorizationHeader);
         Map<String, List> nameList = s3FileService.uploadFile(multipartFile);
-
         String newPath = userService.updatePicture(userId, nameList);
-
         return new ResponseEntity<>(newPath,HttpStatus.OK);
     }
 
@@ -103,10 +94,16 @@ public class UserController {
     /** 마이페이지에 내 프로필 정보 반환 **/
     @GetMapping("/profile/mypage")
     public ResponseEntity<?> getProfile(@RequestHeader("Authorization") String authorizationHeader){
-        String jwtToken = authorizationHeader.substring(7);
-        Long userId = jwtUtil.getUserId(jwtToken);
-
+        Long userId = findUserIdByJwt(authorizationHeader);
         ProfileResponseDto profileResponse = userService.getProfile(userId);
         return new ResponseEntity<>(profileResponse,HttpStatus.OK);
+    }
+
+    private Long findUserIdByJwt(String authorizationHeader) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
+            throw new IllegalArgumentException("findUserIdByJwtToken: Authorization header가 유효하지 않습니다");
+        }
+        String jwtToken = authorizationHeader.substring(BEARER_PREFIX.length());
+        return jwtUtil.getUserId(jwtToken);
     }
 }
