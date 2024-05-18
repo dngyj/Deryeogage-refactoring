@@ -16,10 +16,10 @@ import java.util.List;
 @RequestMapping("/api/postcosts")
 @RequiredArgsConstructor
 public class PostCostController {
-    //TODO: 프론트 데이터 입력값 수정
+    private static final String BEARER_PREFIX = "Bearer ";
+
     private final JwtUtil jwtUtil;
     private final PostCostService postCostService;
-
 
     // 후 책임비 납부하기(입양 일정 저장하기 전에 납부)
     @PostMapping("/{boardId}")
@@ -49,5 +49,13 @@ public class PostCostController {
         Long userId = jwtUtil.getUserId(jwtToken);
         postCostService.normalReturn(userId, postCostDto);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private Long findUserIdByJwt(String authorizationHeader) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
+            throw new IllegalArgumentException("findUserIdByJwtToken: Authorization header가 유효하지 않습니다");
+        }
+        String jwtToken = authorizationHeader.substring(BEARER_PREFIX.length());
+        return jwtUtil.getUserId(jwtToken);
     }
 }

@@ -273,10 +273,4 @@ public class UserService {
 
         return profile;
     }
-
-//    @Cacheable(key = "#userId", value="users")
-//    public UserEntity findUsersById(Long userId){
-//        return userRepository.findById(userId)
-//                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다. userId: "+userId));
-//    }
 }
