@@ -1,5 +1,5 @@
 #base image 설정
-FROM node:18 as build
+FROM node:18
 
 #컨테이너 내부 작업 디렉토리 설정
 WORKDIR /app
