@@ -9,6 +9,7 @@ pipeline {
         DOCKER = 'sudo docker'
         TIME_ZONE = 'Asia/Seoul'
         TAG = "docker-react:${env.BUILD_ID}"
+         NODE_OPTIONS = '--max-old-space-size=1024'
     }
 
 
@@ -16,6 +17,8 @@ stages {
     stage('prepare') {
         steps {
             dir('Front'){
+                sh 'npm cache clean --force'
+                sh 'rm -rf node_modules'
                 sh 'npm install'
             }
         }
