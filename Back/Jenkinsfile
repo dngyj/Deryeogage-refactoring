@@ -4,6 +4,10 @@ pipeline {
     environment {
         CONTAINER_NAME = "drgg-back"
         IMAGE_NAME = "drgg"
+        CONFIG_PATH = "/properties/config/application.properties" // 서버의 application.properties 경로
+        S3_CONFIG_PATH = "/properties/config/application-s3.properties" // 서버의 application-s3.properties 경로
+        CONTAINER_CONFIG_PATH = "/src/main/resources/application.properties" // 컨테이너 내의 경로
+        CONTAINER_S3_CONFIG_PATH = "/src/main/resources/application-s3.properties" // 컨테이너 내의 경로
     }
     stages {
         stage('Build') {
@@ -72,7 +76,13 @@ pipeline {
         stage('Deploy') {
             steps {
                 script{
+                    // Docker 컨테이너 실행
                     sh 'docker run --name ${CONTAINER_NAME} -d -p 8080:8080 ${IMAGE_NAME}'
+                    // 설정 파일 복사
+                    sh 'docker cp ${CONFIG_PATH} ${CONTAINER_NAME}:${CONTAINER_CONFIG_PATH}'
+                    sh 'docker cp ${S3_CONFIG_PATH} ${CONTAINER_NAME}:${CONTAINER_S3_CONFIG_PATH}'
+                    // 컨테이너 재시작
+                    sh 'docker restart ${CONTAINER_NAME}'
                 }
             }
             post {
