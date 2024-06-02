@@ -73,6 +73,20 @@ pipeline {
                 }
             }
         }
+        stage('Check Paths and Permissions') {
+            steps {
+                script {
+                    // Jenkins 사용자가 누구인지 확인
+                    sh "whoami"
+
+                    // 파일 복사 전 경로 확인
+                    sh "ls -la /home/ubuntu/properties/config"
+
+                    // 권한 변경
+                    sh "sudo chmod -R 755 /home/ubuntu/properties/config"
+                }
+            }
+        }
         stage('Deploy') {
             steps {
                 script{
