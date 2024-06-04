@@ -1,112 +1,112 @@
-pipeline {
-    agent any
+// pipeline {
+//     agent any
 
-    environment {
-        CONTAINER_NAME = "drgg-back"
-        IMAGE_NAME = "drgg"
-        CONFIG_PATH = "/home/ubuntu/properties/config/application.properties" // 서버의 application.properties 경로
-        S3_CONFIG_PATH = "/home/ubuntu/properties/config/application-s3.properties" // 서버의 application-s3.properties 경로
-        CONTAINER_CONFIG_PATH = "/src/main/resources/application.properties" // 컨테이너 내의 경로
-        CONTAINER_S3_CONFIG_PATH = "/src/main/resources/application-s3.properties" // 컨테이너 내의 경로
-    }
-    stages {
-        stage('Build') {
-            steps {
-                dir('Back') {
-                    sh 'chmod +x gradlew'
-                    sh './gradlew clean build'
-                }
-            }
-            post {
-                success {
-                    echo 'gradle build success'
-                }
-                failure {
-                    echo 'gradle build failed'
-                }
-            }
-        }
+//     environment {
+//         CONTAINER_NAME = "drgg-back"
+//         IMAGE_NAME = "drgg"
+//         CONFIG_PATH = "/home/ubuntu/properties/config/application.properties" // 서버의 application.properties 경로
+//         S3_CONFIG_PATH = "/home/ubuntu/properties/config/application-s3.properties" // 서버의 application-s3.properties 경로
+//         CONTAINER_CONFIG_PATH = "/src/main/resources/application.properties" // 컨테이너 내의 경로
+//         CONTAINER_S3_CONFIG_PATH = "/src/main/resources/application-s3.properties" // 컨테이너 내의 경로
+//     }
+//     stages {
+//         stage('Build') {
+//             steps {
+//                 dir('Back') {
+//                     sh 'chmod +x gradlew'
+//                     sh './gradlew clean build'
+//                 }
+//             }
+//             post {
+//                 success {
+//                     echo 'gradle build success'
+//                 }
+//                 failure {
+//                     echo 'gradle build failed'
+//                 }
+//             }
+//         }
 
-        stage('Docker Delete') {
-            steps {
-                script {
-                    try{
-                        sh 'echo "Docker Delete Start"'
-                        // 컨테이너 존재 시 삭제
-                        sh "docker stop ${CONTAINER_NAME}"
-                        sh "docker rm -f ${CONTAINER_NAME}"
-                    }catch (Exception e){
-                        echo "Docker container ${CONTAINER_NAME} does not exist. skip"
-                    }
-                    try{
-                        // 이미지 존재 시 삭제
-                        sh "docker image rm ${IMAGE_NAME}"
-                    }catch (Exception e){
-                        echo "Docker image ${IMAGE_NAME} does not exist. skip"
-                    }
-                }
-            }
-            post {
-                success {
-                    sh 'echo "Docker delete Success"'
-                }
-                failure {
-                    sh 'echo "Docker delete Fail"'
-                }
-            }
-        }
+//         stage('Docker Delete') {
+//             steps {
+//                 script {
+//                     try{
+//                         sh 'echo "Docker Delete Start"'
+//                         // 컨테이너 존재 시 삭제
+//                         sh "docker stop ${CONTAINER_NAME}"
+//                         sh "docker rm -f ${CONTAINER_NAME}"
+//                     }catch (Exception e){
+//                         echo "Docker container ${CONTAINER_NAME} does not exist. skip"
+//                     }
+//                     try{
+//                         // 이미지 존재 시 삭제
+//                         sh "docker image rm ${IMAGE_NAME}"
+//                     }catch (Exception e){
+//                         echo "Docker image ${IMAGE_NAME} does not exist. skip"
+//                     }
+//                 }
+//             }
+//             post {
+//                 success {
+//                     sh 'echo "Docker delete Success"'
+//                 }
+//                 failure {
+//                     sh 'echo "Docker delete Fail"'
+//                 }
+//             }
+//         }
 
-        stage('Dockerizing'){
-            steps{
-                sh 'echo " Image Bulid Start"'
-                // 도커 이미지를 기반으로 컨테이너 빌드
-                dir('Back') {
-                    sh 'docker build -t ${IMAGE_NAME} .'
-                }
-            }
-            post {
-                success {
-                    sh 'echo "Bulid Docker Image Success"'
-                }
-                failure {
-                    sh 'echo "Bulid Docker Image Fail"'
-                }
-            }
-        }
-        stage('Check Paths and Permissions') {
-            steps {
-                script {
-                    // Jenkins 사용자가 누구인지 확인
-                    sh "whoami"
+//         stage('Dockerizing'){
+//             steps{
+//                 sh 'echo " Image Bulid Start"'
+//                 // 도커 이미지를 기반으로 컨테이너 빌드
+//                 dir('Back') {
+//                     sh 'docker build -t ${IMAGE_NAME} .'
+//                 }
+//             }
+//             post {
+//                 success {
+//                     sh 'echo "Bulid Docker Image Success"'
+//                 }
+//                 failure {
+//                     sh 'echo "Bulid Docker Image Fail"'
+//                 }
+//             }
+//         }
+//         stage('Check Paths and Permissions') {
+//             steps {
+//                 script {
+//                     // Jenkins 사용자가 누구인지 확인
+//                     sh "whoami"
 
-                    // 파일 복사 전 경로 확인
-                    sh "ls -la /home/ubuntu/properties/config"
+//                     // 파일 복사 전 경로 확인
+//                     sh "ls -la /home/ubuntu/properties/config"
 
-                    // 권한 변경
-                    sh "sudo chmod -R 755 /home/ubuntu/properties/config"
-                }
-            }
-        }
-        stage('Deploy') {
-            steps {
-                script{
-                    // Docker 컨테이너 실행
-                    sh 'docker run --name ${CONTAINER_NAME} -d -p 8080:8080 ${IMAGE_NAME}'
-                    // 설정 파일 복사
-                    sh 'docker cp ${CONFIG_PATH} ${CONTAINER_NAME}:${CONTAINER_CONFIG_PATH}'
-                    sh 'docker cp ${S3_CONFIG_PATH} ${CONTAINER_NAME}:${CONTAINER_S3_CONFIG_PATH}'
-                    // 컨테이너 재시작
-                    sh 'docker restart ${CONTAINER_NAME}'
-                }
-            }
-            post {
-                success {
-                    echo 'Deploy success'
-                }
-                failure {
-                    echo 'Deploy failed'
-                }
-            }
-        }
-    }
-}
+//                     // 권한 변경
+//                     sh "sudo chmod -R 755 /home/ubuntu/properties/config"
+//                 }
+//             }
+//         }
+//         stage('Deploy') {
+//             steps {
+//                 script{
+//                     // Docker 컨테이너 실행
+//                     sh 'docker run --name ${CONTAINER_NAME} -d -p 8080:8080 ${IMAGE_NAME}'
+//                     // 설정 파일 복사
+//                     sh 'docker cp ${CONFIG_PATH} ${CONTAINER_NAME}:${CONTAINER_CONFIG_PATH}'
+//                     sh 'docker cp ${S3_CONFIG_PATH} ${CONTAINER_NAME}:${CONTAINER_S3_CONFIG_PATH}'
+//                     // 컨테이너 재시작
+//                     sh 'docker restart ${CONTAINER_NAME}'
+//                 }
+//             }
+//             post {
+//                 success {
+//                     echo 'Deploy success'
+//                 }
+//                 failure {
+//                     echo 'Deploy failed'
+//                 }
+//             }
+//         }
+//     }
+// }
