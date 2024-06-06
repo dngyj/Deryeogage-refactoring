@@ -37,9 +37,8 @@ dependencies {
 	// implementation 'org.springframework.boot:spring-boot-starter-security' // 일단 보류
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-	// implementation 'com.mysql:mysql-connector-j' // 컴파일과 런타임 시점
+	implementation 'com.mysql:mysql-connector-j' // 컴파일과 런타임 시점
 	//    runtimeOnly 'com.mysql:mysql-connector-j' // 이렇게도 가능 런타임 시점만
-	runtimeOnly 'com.mysql:mysql-connector-j:8.0.22'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
