@@ -25,6 +25,9 @@ public class RedisConfig {
     @Value("${spring.redis.port}")
     private int port;
 
+    @Value("${spring.redis.password}")
+    private String password;
+
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
 
@@ -33,6 +36,7 @@ public class RedisConfig {
         // RedisClusterConfiguration conf = new RedisClusterConfiguration();
         conf.setHostName(host);
         conf.setPort(port);
+        conf.setPassword(password);
         return new LettuceConnectionFactory(conf);
     }
 
