@@ -281,7 +281,7 @@ function AdoptBoard() {
             <S.BoardGrid>
               {dogsToShow.map((dog) => (
                 <S.Media key={dog.id} onClick={() => handleDogClick(dog)}>
-                  <DogListItem dog={dog} media={dog.fileList[0]} />
+                  <DogListItem dog={dog} media={dog.fileList} />
                   <S.DistanceLabel 
         onMouseEnter={() => setIsHovered(dog.id)} 
         onMouseLeave={() => setIsHovered(null)}>
