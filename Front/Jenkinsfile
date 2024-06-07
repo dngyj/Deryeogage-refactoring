@@ -1,56 +1,56 @@
-pipeline {
-    agent any
+// pipeline {
+//     agent any
 
-     tools {
-       nodejs "node"
-     }
+//      tools {
+//        nodejs "node"
+//      }
 
-     environment {
-        DOCKER = 'sudo docker'
-        TIME_ZONE = 'Asia/Seoul'
-        TAG = "docker-react:${env.BUILD_ID}"
-         NODE_OPTIONS = '--max-old-space-size=1024'
-    }
+//      environment {
+//         DOCKER = 'sudo docker'
+//         TIME_ZONE = 'Asia/Seoul'
+//         TAG = "docker-react:${env.BUILD_ID}"
+//          NODE_OPTIONS = '--max-old-space-size=1024'
+//     }
 
 
-stages {
-    stage('prepare') {
-        steps {
-            dir('Front'){
-                sh 'npm cache clean --force'
-                sh 'rm -rf node_modules'
-                sh 'npm install'
-            }
-        }
-    }
-    stage('build') {
-        steps {
-            dir('Front'){
-                sh 'CI=false npm run build'
-                sh '''
-                echo 'Docker image build'
-                docker build --no-cache -t $TAG .
-                '''
-            }
-        }
-    }
-    stage('Deploy') {
-            steps {
-                dir('Front'){
-                    script {
-                        try {
-                            sh 'docker stop drggFront'
-                            sh 'docker rm drggFront'
-                        } catch (Exception e) {
-                            echo "Failed to stop or remove Docker container, proceeding anyway"
-                        }
-                    }
-                    sh '''
-                    echo 'Deploy'
-                    docker run -d -p 3000:3000 -v /etc/localtime:/etc/localtime:ro -e TZ=Asia/Seoul --name drggFront $TAG
-                    '''
-                }
-            }
-        }
-}
-}
+// stages {
+//     stage('prepare') {
+//         steps {
+//             dir('Front'){
+//                 sh 'npm cache clean --force'
+//                 sh 'rm -rf node_modules'
+//                 sh 'npm install'
+//             }
+//         }
+//     }
+//     stage('build') {
+//         steps {
+//             dir('Front'){
+//                 sh 'CI=false npm run build'
+//                 sh '''
+//                 echo 'Docker image build'
+//                 docker build --no-cache -t $TAG .
+//                 '''
+//             }
+//         }
+//     }
+//     stage('Deploy') {
+//             steps {
+//                 dir('Front'){
+//                     script {
+//                         try {
+//                             sh 'docker stop drggFront'
+//                             sh 'docker rm drggFront'
+//                         } catch (Exception e) {
+//                             echo "Failed to stop or remove Docker container, proceeding anyway"
+//                         }
+//                     }
+//                     sh '''
+//                     echo 'Deploy'
+//                     docker run -d -p 3000:3000 -v /etc/localtime:/etc/localtime:ro -e TZ=Asia/Seoul --name drggFront $TAG
+//                     '''
+//                 }
+//             }
+//         }
+// }
+// }
