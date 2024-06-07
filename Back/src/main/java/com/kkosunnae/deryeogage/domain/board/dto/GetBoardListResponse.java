@@ -23,8 +23,8 @@ public class GetBoardListResponse {
     private String name;
     private byte age;
     private LocalDateTime createdDate;
-    private List fileList;
-    private AdoptStatus status;
+    private String status;
+    private String fileList;
 
     public BoardEntity toEntity(UserEntity user){
         return BoardEntity.builder()

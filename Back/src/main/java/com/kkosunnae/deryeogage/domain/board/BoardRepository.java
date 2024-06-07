@@ -1,6 +1,6 @@
 package com.kkosunnae.deryeogage.domain.board;
 
-
+import com.kkosunnae.deryeogage.domain.board.dto.GetBoardListResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -21,5 +21,15 @@ public interface BoardRepository extends JpaRepository<BoardEntity, Integer> {
 
     @Query("SELECT b.user.id, b.title FROM BoardEntity b WHERE b.id = :boardId")
     Optional<Object[]> findUserIdAndTitleByBoardId(Integer boardId);
+
+    @Query("SELECT new com.kkosunnae.deryeogage.domain.board.dto.GetBoardListResponse(" +
+            "b.id, b.regionCode, b.lat, b.lon, b.userNickname, b.title, b.name, b.age, b.createdDate, " +
+            "CASE WHEN a.status = 'depart' THEN 'depart' ELSE 'arrive' END, " +
+            "f.path) " +
+            "FROM BoardEntity b " +
+            "LEFT JOIN b.adopts a " +
+            "LEFT JOIN b.boardFiles f " +
+            "WHERE f.id = (SELECT MIN(f2.id) FROM BoardFileEntity f2 WHERE f2.board = b)")
+    List<GetBoardListResponse> findAllBoardList();
 
 }
