@@ -126,40 +126,10 @@ public class BoardService {
     //전체 게시글 목록 조회
     @Transactional(readOnly = true)
     public List<GetBoardListResponse> findAll() {
-
-        List<GetBoardListResponse> boardSetList = new ArrayList<>();
-
-        // 모든 게시글 리스트 가져오기
-        List<BoardEntity> boardEntityList = boardRepository.findAll();
-        // 모든 게시글을 돌면서
-        for (BoardEntity boardEntity : boardEntityList) {
-            Integer boardId = boardEntity.getId();
-            // 입양 정보에 존재 여부 및 depart/arrive 확인하여 게시글별 status 반환
-            Optional<AdoptEntity> entity = adoptRepository.findByBoardId(boardId);
-            // 초기화
-            AdoptStatus status = AdoptStatus.depart;
-
-            if (entity.isPresent()) {
-                status = entity.get().getStatus();
-            } else {
-                status = null;
-            }
-            // 하나의 게시글 정보를 dto로 변환
-            GetBoardListResponse thisBoard = boardEntity.toGetBoardListResponse();
-            // dto에 입양 정보 담고
-            thisBoard.setStatus(status);
-            // 하나의 게시글 ID를 가져오고
-            Integer thisBoardId = boardEntity.getId();
-            // 특정 게시글에 업로드된 파일을 꺼내기
-            List<String> uploadedFiles = this.getBoardFileUrls(thisBoardId);
-
-            // Dto에 담기
-            thisBoard.setFileList(uploadedFiles);
-
-            boardSetList.add(thisBoard);
-        }
+        List<GetBoardListResponse> boardSetList = boardRepository.findAllBoardList();
         Collections.shuffle(boardSetList);
         return boardSetList;
+
     }
 
     //전체 게시글 목록 조회 (추천)
