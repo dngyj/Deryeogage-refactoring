@@ -34,6 +34,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "/webjars/**",
                         "/api/users/oauth",
                         "/api/boards/list",
+                        "/api/boards/list/pages",
                         "/api/boards/each/**");
     }
 

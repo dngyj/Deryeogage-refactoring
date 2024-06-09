@@ -15,6 +15,8 @@ import com.kkosunnae.deryeogage.domain.user.UserService;
 import com.kkosunnae.deryeogage.global.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -129,7 +131,13 @@ public class BoardService {
         List<GetBoardListResponse> boardSetList = boardRepository.findAllBoardList();
         Collections.shuffle(boardSetList);
         return boardSetList;
+    }
 
+
+    @Transactional(readOnly = true)
+    public Page<GetBoardListResponse> findAllPage(Pageable pageable) {
+        Page<GetBoardListResponse> boardSetPage = boardRepository.findAllBoardPageList(pageable);
+        return boardSetPage;
     }
 
     //전체 게시글 목록 조회 (추천)
