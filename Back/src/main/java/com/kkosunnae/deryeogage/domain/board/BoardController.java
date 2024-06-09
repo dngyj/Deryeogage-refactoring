@@ -15,6 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.*;
 
@@ -141,6 +144,14 @@ public class BoardController {
         // log.info(stopWatch.prettyPrint());
         // log.info("코드 실행 시간 (s): " + stopWatch.getTotalTimeSeconds());
         return new ResponseEntity<>(boardSetList,HttpStatus.OK);
+    }
+    @GetMapping("/list/pages")
+    public ResponseEntity<?> findBoardsPage(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<GetBoardListResponse> boardSetPage = boardService.findAllPage(pageable);
+        return new ResponseEntity<>(boardSetPage, HttpStatus.OK);
     }
 
     //내가 쓴 글 목록 조회(마이페이지)
